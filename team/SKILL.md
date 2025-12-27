@@ -77,7 +77,9 @@ When invoked, this skill should:
 The goal is minimal orchestration overhead. This is a trigger, not a controller.
 
 <team_knowledge>
-Genesis has not been run. Team protocols undefined.
+Genesis complete (2025-12-27). Team protocols defined in TEAM.md v1.0.
+Dashboard available: .team/dashboard.ps1
+Next: Run `/team iterate` when improvements needed.
 </team_knowledge>
 
 <!-- END MUTABLE SECTION -->
