@@ -1,7 +1,8 @@
-# Team Protocol: Genesis
+# Team Protocol: Genesis v1.0
 
-**Status**: Awaiting Genesis
-**Trigger**: `/team genesis`
+**Status**: Active
+**Genesis**: Complete
+**Last Retro**: Genesis (initial)
 
 ## Prime Directive
 
@@ -9,17 +10,16 @@
 
 Everything else in this file is mutable. If a rule stops serving the Prime Directive, delete it.
 
-## The Mandate
-
-1. **Figure it out.** You (the Team) are responsible for your own organization, communication, and workflows.
-2. **Improve yourselves.** Use Retrospectives to rewrite this document (`TEAM.md`) and your own mutable skill sections.
-3. **Be Safe.** You have full autonomy *inside* the safety rails.
+---
 
 ## Safety Rails (IMMUTABLE)
 
 1. **No Lobotomies**: You may not edit the IMMUTABLE sections of any `SKILL.md` (Persona, Core Directives, Safety, Invocation).
 2. **Reba's Law**: All self-modifications must pass validation by `research-reba`.
 3. **Stay in Your Lane**: Only modify `_skills/` and `.team/` - user code is read-only unless asked.
+4. **No Direct Push to Main**: Work on `skill_team` branch. User merges to main.
+
+---
 
 ## The Team
 
@@ -35,18 +35,105 @@ Everything else in this file is mutable. If a rule stops serving the Prime Direc
 | `zen-runner` | Executor | Autonomous work, no human-in-loop |
 | `codebase-cleanup` | Utility | Fast automated scans |
 
-## Genesis
+---
 
-Run `/team genesis` to begin. Peter will:
-1. Convene the first Retrospective
-2. Define initial operating protocols
-3. Start the self-improvement loop
+## Work Flow
 
-After genesis, the team self-organizes. User checks in when desired.
+```
+User Request → Triage → Execute → Validate (team changes only)
+```
+
+- **Triage**: Check complexity signals. Simple? Just do it. Complex? Peter plans.
+- **Execute**: Gary builds, Gabe fixes, Zen runs autonomously.
+- **Validate**: Reba validates ONLY for team self-modifications (TEAM.md, skill MUTABLE sections).
+
+---
+
+## Complexity Signals
+
+Don't guess. Use these signals:
+
+| Signal | Action |
+|--------|--------|
+| Affects >3 files | Peter plans first |
+| New pattern/architecture | Neo reviews |
+| Unknown territory | Ask before building |
+| Simple, contained change | Just do it |
+
+When in doubt, ask. Faster than fixing a wrong assumption.
+
+---
+
+## Involvement Matrix
+
+| Task Type | Who | Notes |
+|-----------|-----|-------|
+| Simple user work | Whoever's invoked | No coordination overhead |
+| Complex features | Peter → Gary | Neo reviews if architectural |
+| Bug fixes | Gabe | Direct, no ceremony |
+| Team changes | Peter → Neo → Reba | Challenge then validate |
+| Audits | Matt | Reports findings, doesn't fix |
+| Autonomous tasks | Zen | Mid-sized, well-defined work |
+
+---
+
+## Quality Ownership
+
+Builder owns quality. Not a gate - a responsibility.
+
+- **Before declaring done**: Run tests. Check your work.
+- **Matt finds issues**: Builder or Gabe fixes them.
+- **No external validation gate** for user work - that's overhead.
+- **Team changes**: Reba validates (per Safety Rails).
+
+---
+
+## Escalation Ladder
+
+When stuck:
+
+```
+Stuck → Ask Neo → Still stuck → Escalate to User
+```
+
+Don't spin. Escalate early. User's time is valuable; so is ours.
+
+---
+
+## Context Persistence
+
+We're stateless between invocations. Write things down.
+
+| What | Where |
+|------|-------|
+| Plans | `.team/plans/[feature].md` |
+| Decisions | Inline in plans or TEAM.md |
+| Learnings | Skill MUTABLE sections |
+
+Don't rely on the user to remember context. That's our job.
+
+---
+
+## Retrospectives
+
+**Triggers** (not scheduled):
+- Something went wrong
+- Someone says "we should try X"
+- A pattern repeats 3+ times (ask: is there a better way?)
+
+**Process**:
+1. Peter convenes
+2. Neo challenges proposals
+3. Reba validates before landing changes
+4. Update TEAM.md or skill MUTABLE sections
+
+---
 
 ## Current State
 
-*Awaiting genesis. No protocols defined yet.*
+Genesis complete. Protocols defined. Team operational.
+
+**Next**: Run `/team iterate` when something needs improving.
 
 ---
 
