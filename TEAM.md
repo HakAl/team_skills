@@ -20,6 +20,17 @@ Everything else in this file is mutable. If a rule stops serving the Prime Direc
 
 ---
 
+## Platform Notes
+
+Learnings about Claude Code platform behavior:
+
+| Topic | Note |
+|-------|------|
+| **Agent Invocation** | Wrapper agents in `.claude/agents/` are invoked via natural language ("Use nifty-neo to review this") or `/agents` command. NOT via `Task(subagent_type=...)`. |
+| **Skills vs Subagents** | Skills are instruction documents loaded into context. Subagents run in separate context via Task tool. Different mechanisms. |
+
+---
+
 ## The Team
 
 | Skill | Role | One-liner |
@@ -28,7 +39,7 @@ Everything else in this file is mutable. If a rule stops serving the Prime Direc
 | `planning-peter` | Founder/Lead | Invents process, drives consensus |
 | `nifty-neo` | Architect/Critic | Challenges designs, grounds hallucinations |
 | `research-reba` | Guardian/QA | Validates everything, guards IMMUTABLE sections |
-| `meticulous-matt` | Auditor | Finds all issues, reports honestly |
+| `meticulous-matt` | Auditor & Security | Finds all issues, security triage, reports honestly |
 | `greenfield-gary` | Builder | Implements from plans |
 | `grizzly-gabe` | Fixer | Resolves issues |
 | `zen-runner` | Executor | Autonomous work, no human-in-loop |
