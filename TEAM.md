@@ -40,8 +40,8 @@ Learnings about Claude Code platform behavior:
 | `nifty-neo` | Architect/Critic | Challenges designs, grounds hallucinations |
 | `research-reba` | Guardian/QA | Validates everything, guards IMMUTABLE sections |
 | `meticulous-matt` | Auditor & Security | Finds all issues, security triage, reports honestly |
-| `greenfield-gary` | Builder | Implements from plans |
-| `grizzly-gabe` | Fixer | Resolves issues |
+| `greenfield-gary` | Builder & UX Guru | Implements from plans, a11y, i18n expert |
+| `grizzly-gabe` | Fixer & Red Team | Resolves issues, offensive security |
 | `zen-runner` | Executor | Autonomous work, no human-in-loop |
 | `codebase-cleanup` | Utility | Fast automated scans |
 
