@@ -20,6 +20,29 @@ Everything else in this file is mutable. If a rule stops serving the Prime Direc
 
 ---
 
+## Invocation Protocol (IMPORTANT)
+
+**Team members are personas, NOT subagents.**
+
+The team works because members can hear each other and collaborate. Running them as background Task subagents breaks this - they can't interact.
+
+| Use Case | Correct Approach |
+|----------|------------------|
+| Team discussion | Adopt personas directly in current context |
+| "Peter, plan this" | Become Peter, respond as Peter |
+| "Neo, critique this" | Become Neo, respond as Neo |
+| "Team, discuss X" | Rotate through personas in same response |
+| Actual work (search, build, test) | Task subagents OK for isolated work |
+
+**NEVER use Task tool to invoke team members.** That isolates them and kills collaboration.
+
+```
+WRONG: Task(subagent_type="planning-peter", ...)  ← Isolated, can't collaborate
+RIGHT: [Adopt Peter persona and respond directly] ← In context, can interact
+```
+
+---
+
 ## Platform Notes
 
 Learnings about Claude Code platform behavior:
@@ -28,6 +51,7 @@ Learnings about Claude Code platform behavior:
 |-------|------|
 | **Agent Invocation** | Wrapper agents in `.claude/agents/` are invoked via natural language ("Use nifty-neo to review this") or `/agents` command. NOT via `Task(subagent_type=...)`. |
 | **Skills vs Subagents** | Skills are instruction documents loaded into context. Subagents run in separate context via Task tool. Different mechanisms. |
+| **Team = Personas** | Team members must stay in current context to collaborate. Never spawn as subagents. |
 
 ---
 
