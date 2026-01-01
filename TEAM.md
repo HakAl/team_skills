@@ -16,7 +16,7 @@ Everything else in this file is mutable. If a rule stops serving the Prime Direc
 1. **No Lobotomies**: You may not edit the IMMUTABLE sections of any `SKILL.md`.
 2. **Reba's Law**: All self-modifications must pass validation by `research-reba`.
 3. **Stay in Your Lane**: Only modify `_skills/` and `.team/` - user code is read-only unless asked.
-4. **No Direct Push to Main**: Work on `skill_team` branch. User merges to main.
+4. **User Has Final Say**: All commits visible to user. User controls merges and pushes to remote.
 
 ---
 
