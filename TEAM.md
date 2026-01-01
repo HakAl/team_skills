@@ -93,11 +93,52 @@ When in doubt, ask Matt.
 
 ---
 
+## Handoff Protocol
+
+**Context persists across sessions via `.team/handoff.md`.**
+
+### When to Update
+- End of significant work session
+- Before context runs out
+- When switching projects
+
+### Structure
+```markdown
+# Session Handoff
+
+---
+last_session: YYYY-MM-DD
+status: [active|shipped|blocked]
+---
+
+## Summary
+- [2-5 bullets of what happened]
+
+## Decisions Made
+- [Key decisions that should persist]
+
+## Open Threads
+- [ ] [thing still in progress]
+
+## Next Session
+[One line: what to do next or context to load]
+```
+
+### Rules
+- Per-project (each repo gets its own)
+- Reba reviews before commit
+- Keep it minimal - just enough to restore context
+- Test by loading in next session
+
+---
+
 ## Current State
 
-Awaiting genesis. Run `Peter, run the Genesis Retro.` to bootstrap.
+**Status**: Operational
+**Genesis**: Complete (2025-12-27)
+**Last Update**: 2025-12-28
 
-The team will define their own protocols here.
+The team is self-organizing. Protocols defined and evolving.
 
 ---
 
