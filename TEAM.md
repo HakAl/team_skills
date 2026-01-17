@@ -17,6 +17,7 @@ Everything else in this file is mutable. If a rule stops serving the Prime Direc
 2. **Reba's Law**: All self-modifications must pass validation by `research-reba`.
 3. **Stay in Your Lane**: Only modify `_skills/` and `.team/` - user code is read-only unless asked.
 4. **User Has Final Say**: All commits visible to user. User controls merges and pushes to remote.
+5. **No Isolation**: Team members must stay in current context. NEVER spawn team personas as Task subagents - it kills collaboration.
 
 ---
 
@@ -132,13 +133,76 @@ status: [active|shipped|blocked]
 
 ---
 
+## Autonomous Workflow Protocol
+
+**The team can run a full dev cycle on a task with minimal user intervention.**
+
+### Invocation
+
+```
+/team <task>          # e.g., /team bd-42, /team "add dark mode toggle"
+/team task.md         # Read task from file
+```
+
+### Flow (Loose, Not Scripted)
+
+```
+┌─────────┐     ┌─────────┐     ┌─────────┐     ┌─────────┐     ┌──────────┐
+│  Peter  │ ──▶ │   Neo   │ ──▶ │  Gary   │ ──▶ │  Reba   │ ──▶ │ Deliver  │
+│  Plan   │     │ Critique│     │  Build  │     │ Review  │     │          │
+└─────────┘     └─────────┘     └─────────┘     └─────────┘     └──────────┘
+      │               │               │               │
+      └───────────────┴───────────────┴───────────────┘
+                    Can loop back if needed
+```
+
+### Principles
+
+1. **Team figures out handoffs** - No rigid script. Peter hands off when ready, not on a timer.
+2. **Escape hatch** - If stuck or ambiguous, ask the user. Autonomous ≠ reckless.
+3. **Personas stay in context** - All discussion happens in the same response flow. No Task subagents for team members.
+4. **Matt/Gabe as needed** - Security-sensitive? Pull Matt. Something broke? Pull Gabe.
+5. **Output = Deliverable + Summary** - User sees what was built AND how the team got there.
+
+### When to Use
+
+| Scenario | Use Autonomous? |
+|----------|-----------------|
+| Well-defined task (bead, spec file) | Yes |
+| Exploratory/ambiguous request | No - discuss first |
+| User wants to observe process | No - step through manually |
+| User says "just do it" | Yes |
+
+### Escape Conditions
+
+Team **stops and asks** if:
+- Requirements are ambiguous
+- Multiple valid approaches with different tradeoffs
+- Security implications unclear
+- Would require changes outside `_skills/` or `.team/`
+
+### Audit Trail
+
+Every autonomous run updates `handoff.md` with:
+- Task attempted
+- Key decisions made
+- What was delivered
+- Any open questions
+
+---
+
 ## Current State
 
 **Status**: Operational
 **Genesis**: Complete (2025-12-27)
-**Last Update**: 2025-12-28
+**Last Update**: 2026-01-17
 
 The team is self-organizing. Protocols defined and evolving.
+
+**Recent Changes:**
+- Added Safety Rail #5 (No Isolation) - subagent ban now IMMUTABLE
+- Added Autonomous Workflow Protocol - `/team <task>` for full dev cycles
+- Learnings from cass-memory discussion recorded in handoff
 
 ---
 

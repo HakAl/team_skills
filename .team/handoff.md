@@ -1,35 +1,38 @@
 # Session Handoff
 
 ---
-last_session: 2026-01-01
+last_session: 2026-01-17
 status: active
 ---
 
-## Summary (Previous Session: 2025-12-28)
-- Shipped GitHub Pages site (hakal.github.io/team_skills)
-- Added Code Review Protocol to TEAM.md
-- Added Invocation Protocol (team = personas, not subagents)
-- Added Handoff Protocol to TEAM.md
-- Expanded Gary (UX Guru) and Gabe (Red Team)
-- Created 4 security beads for zen-mode (P0-P2)
-- Evaluated mcp_agent_mail and AutoGen - tabled both
-- First community interaction - responded to GitHub issue on self-organization
-- Identified suspicious axon repo (QuantumNiyam) - deleted
-
-## Current Session (2026-01-01)
-- Handoff context loaded successfully
+## Summary (Previous Session: 2026-01-01)
 - zen-mode security changes accepted and committed
+- Safety Rail #4 updated (stale branch reference removed)
+- QuantumNiyam conversation concluded - recognized social engineering pattern
+
+## Current Session (2026-01-17)
+- User shared cass-memory system (`cm`) for team consideration
+- Full team discussion: Peter (excited), Neo (skeptical), Reba (cautious)
+- **Voted unanimously** for Autonomous Team Workflow (`/team <task>`)
+- Split on Learnings Protocol - tabled for informal experimentation
+
+## Learnings (cm-inspired)
+- **Memory should decay without validation** - knowledge needs re-confirmation
+- **Inflection points > every run** - log what matters, not everything
+- **Discipline before tooling** - try manually before automating
+- **Counterfactual value is invisible** - mistakes not made can't be measured
 
 ## Decisions Made
 - Team members are personas in same context, NOT Task subagents
 - Static HTML > complex infrastructure for simple needs
 - Per-project handoff files, not global
 - Reba reviews all code, Matt for security-sensitive
-- master is default branch (deleted stale skill_team)
+- **NEW**: Autonomous workflow approved - team can run full dev cycle on `/team <task>`
 
 ## Open Threads
-- [x] zen-mode scope-limited trust PR (zen-p9i) - COMPLETED
-- [x] Safety Rail #4 updated - removed stale branch reference, preserved user oversight intent
+- [x] Draft Autonomous Workflow Protocol for TEAM.md - DONE
+- [x] Add Safety Rail #5 (No Isolation) to make subagent ban IMMUTABLE - DONE
+- [x] Update /team skill with autonomous command - DONE
 
 ## Next Session
-Handoff system working. Awaiting user direction.
+Test autonomous workflow with real task. `/team <task>` ready for use.
