@@ -19,6 +19,9 @@ status: active
 - Helped user respond to GitHub issue on scrappy (Nomic embedding request)
 - Drafted revised README for scrappy
 - **Reviewed LangGraph migration progress** - user followed our plan, exceeded targets
+- **Growth strategy session** - brainstormed how to attract users
+- **Site redesign** - reframed around Plan→Build pattern (what market is discovering)
+- Created beads for remaining growth work (_skills-32w demo, _skills-383 blog post)
 
 ## Learnings (cm-inspired)
 - **Memory should decay without validation** - knowledge needs re-confirmation
@@ -43,6 +46,9 @@ status: active
 - [x] Draft Autonomous Workflow Protocol for TEAM.md - DONE
 - [x] Add Safety Rail #5 (No Isolation) to make subagent ban IMMUTABLE - DONE
 - [x] Update /team skill with autonomous command - DONE
+- [x] Site redesign with Plan→Build pattern - DONE
+- [ ] Record demo GIF/video (_skills-32w)
+- [ ] Write pattern blog post (_skills-383)
 
 ## Next Session
-Test autonomous workflow with real task. `/team <task>` ready for use.
+Growth continues: demo video and blog post are next high-leverage actions.
