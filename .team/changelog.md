@@ -4,6 +4,38 @@ All notable changes to team structure, processes, and skills.
 
 ---
 
+## 2026-01-17 - Autonomous Workflow
+
+### Added
+- **Autonomous Workflow Protocol** - `/team <task>` runs full dev cycle
+  - Team self-organizes: Peter plans → Neo critiques → Gary builds → Reba reviews
+  - Escape hatches for ambiguity, security concerns, scope boundaries
+  - No rigid script - team figures out handoffs naturally
+
+- **Safety Rail #5 (No Isolation)** - Now IMMUTABLE
+  - Team members must stay in current context
+  - NEVER spawn team personas as Task subagents - kills collaboration
+  - Promoted from Invocation Protocol to Safety Rails
+
+### Learned (from cass-memory discussion)
+- **Memory should decay without validation** - Knowledge needs re-confirmation to stay relevant
+- **Inflection points > every run** - Log what matters, not everything
+- **Discipline before tooling** - Try manually before automating
+- **Counterfactual value is invisible** - Mistakes not made can't be measured
+
+### Process
+- Team voted unanimously for Autonomous Workflow
+- Split on Learnings Protocol (cm-inspired) - tabled for informal experimentation
+- First autonomous workflow test: Playwright MCP navigation to team GitHub
+- Peter proposed → Neo challenged → Team voted → Gary implemented → Reba approved
+
+### External
+- Reviewed cass-memory system (Jeffrey Emanuel's procedural memory for AI agents)
+- Decided: interesting ideas, different problem space than ours
+- Extracted principles without adopting tooling
+
+---
+
 ## 2025-12-28 - Team Goes Public
 
 ### Shipped
