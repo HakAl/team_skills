@@ -111,6 +111,25 @@ li {
     font-size: 1.1rem;
 }
 
+.hero-cta {
+    margin-top: 2rem;
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.button-secondary {
+    background: transparent;
+    border: 2px solid var(--color-primary);
+    color: var(--color-primary);
+}
+
+.button-secondary:hover, .button-secondary:focus {
+    background: var(--color-primary);
+    color: white;
+}
+
 /* Sections */
 .section {
     max-width: var(--max-width);
@@ -122,6 +141,129 @@ li {
     color: var(--color-primary);
     border-bottom: 2px solid var(--color-secondary);
     padding-bottom: 0.5rem;
+}
+
+.section-intro {
+    font-size: 1.1rem;
+    color: var(--color-text-muted);
+    margin-bottom: 2rem;
+}
+
+/* Problem Grid */
+.problem-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+
+.problem-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-secondary);
+    border-left: 4px solid var(--color-primary);
+    border-radius: 8px;
+    padding: 1.5rem;
+}
+
+.problem-card h3 {
+    color: var(--color-text);
+    font-size: 1.1rem;
+    margin-bottom: 0.5rem;
+}
+
+.problem-card p {
+    color: var(--color-text-muted);
+    margin-bottom: 0;
+    font-size: 0.95rem;
+}
+
+/* Workflow Visual */
+.workflow-visual {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 0.5rem;
+    margin: 2rem 0;
+    flex-wrap: wrap;
+}
+
+.workflow-step {
+    background: var(--color-surface);
+    border: 1px solid var(--color-secondary);
+    border-radius: 8px;
+    padding: 1.5rem;
+    text-align: center;
+    flex: 1;
+    min-width: 180px;
+    max-width: 220px;
+}
+
+.workflow-step h3 {
+    color: var(--color-accent);
+    margin-bottom: 0.5rem;
+}
+
+.workflow-step p {
+    font-size: 0.9rem;
+    color: var(--color-text-muted);
+    margin-bottom: 0.75rem;
+}
+
+.step-number {
+    display: inline-block;
+    width: 2rem;
+    height: 2rem;
+    line-height: 2rem;
+    background: var(--color-primary);
+    color: white;
+    border-radius: 50%;
+    font-weight: bold;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+}
+
+.persona-tag {
+    display: inline-block;
+    font-size: 0.8rem;
+    color: var(--color-accent);
+    background: rgba(0, 217, 255, 0.1);
+    padding: 0.2em 0.6em;
+    border-radius: 4px;
+}
+
+.workflow-arrow {
+    color: var(--color-primary);
+    font-size: 1.5rem;
+    font-weight: bold;
+    align-self: center;
+    padding-top: 2rem;
+}
+
+.pattern-result {
+    text-align: center;
+    font-size: 1.1rem;
+    color: var(--color-text);
+    background: var(--color-surface);
+    padding: 1rem 1.5rem;
+    border-radius: 8px;
+    border: 1px solid var(--color-accent);
+}
+
+@media (max-width: 900px) {
+    .workflow-visual {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .workflow-step {
+        max-width: 100%;
+        width: 100%;
+    }
+
+    .workflow-arrow {
+        transform: rotate(90deg);
+        padding: 0;
+    }
 }
 
 /* Roster Grid */
