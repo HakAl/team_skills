@@ -40,22 +40,29 @@ The team writes their own `TEAM.md`. They improve their own skills. You're the f
 
 ## Installation
 
-### 1. Copy to Claude Config
+### Quick Install (Recommended)
 
 ```bash
-# Clone or download this repo
+curl -sL https://raw.githubusercontent.com/HakAl/team_skills/master/install.sh | bash
+```
+
+This installs skills to `~/.claude/skills/` and preserves your existing config.
+
+**To update later, run the same command.**
+
+### Manual Install
+
+```bash
 git clone https://github.com/HakAl/team_skills.git
-
-# Copy to Claude's skills directory
-cp -r team_skills/* ~/.claude/skills/
+cp -r team_skills/{team,planning-peter,nifty-neo,research-reba,meticulous-matt,greenfield-gary,grizzly-gabe,zen-runner,codebase-cleanup,TEAM.md} ~/.claude/skills/
 ```
 
-### 2. Run Genesis
+### Run Genesis
 
-In Claude Code, say:
+In Claude Code:
 
 ```
-Peter, run the Genesis Retro.
+/team genesis
 ```
 
 That's it. Watch them build their own `TEAM.md` and Dashboard.
