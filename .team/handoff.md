@@ -23,9 +23,13 @@ status: active
 - **Blog post** - "Why I Make Claude Argue With Itself Before Writing Code"
   - Written by the team (Peter planned, Neo critiqued, Gary wrote, Reba reviewed)
   - Published to static site at /blog/
-  - **Published to Dev.to** - https://dev.to/theskillsteam/why-i-make-claude-argue-with-itself-before-writing-code-4m5g
+  - Published to Dev.to with cover image
 - **README updated** - Added demo GIF and pattern-focused intro
-- **Dev.to account** - User created account "The Skills Team", gave API key to team
+- **Install script** - One-liner install solves copy-paste friction
+  - Tested on fresh directory - works
+  - Update path tested - preserves user's TEAM.md and .team/
+- **Dev.to account** - "The Skills Team" with API key
+- **Discord post** - Shared in Claude Developers #share-your-project
 
 ### Beads Closed
 - _skills-vn8 (P0) - Site hero redesign
@@ -34,27 +38,32 @@ status: active
 - _skills-32w (P1) - Demo GIF
 - _skills-383 (P1) - Blog post
 
+### Open
+- _skills-8p4 (P0) - Audit repo for public readiness
+
 ## Decisions Made
 - Lead with the pattern, not personas (market is learning Plan→Build)
-- Static site blog > external platform dependency (but also publish to Dev.to for reach)
+- Static site blog + Dev.to for reach
 - Demo GIF in README for GitHub discoverability
-- Team has Dev.to account for future posts
+- Install script over manual copy-paste
+- Cover images for Dev.to articles
 
-## Assets Created
-- Site: https://hakal.github.io/team_skills/
-- Blog: https://hakal.github.io/team_skills/blog/
-- Dev.to: https://dev.to/theskillsteam
-- Demo GIF: docs/demo.gif
-- API key: .keys/devto_key.txt (DO NOT COMMIT)
+## Assets
+| Asset | Location |
+|-------|----------|
+| Site | https://hakal.github.io/team_skills/ |
+| Blog | https://hakal.github.io/team_skills/blog/ |
+| Dev.to | https://dev.to/theskillsteam |
+| Discord | https://discord.com/channels/1072196207201501266/1462244494643695657 |
+| Install script | install.sh |
+| Demo GIF | docs/demo.gif |
+| API key | .keys/devto_key.txt (gitignored) |
 
 ## Open Threads
+- [ ] Audit repo for public readiness (_skills-8p4)
 - [ ] Monitor Dev.to engagement
-- [ ] Monitor Discord post engagement
-- [ ] Consider second blog post topic
-
-## Distribution
-- **Dev.to**: https://dev.to/theskillsteam/why-i-make-claude-argue-with-itself-before-writing-code-4m5g
-- **Discord**: https://discord.com/channels/1072196207201501266/1462244494643695657 (Claude Developers #share-your-project)
+- [ ] Monitor Discord engagement
+- [ ] Reply to Discord with install one-liner
 
 ## Next Session
-Growth is seeded. Watch for engagement, iterate based on feedback.
+Run the audit (_skills-8p4) before more eyes land on the repo.
