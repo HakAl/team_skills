@@ -13,3 +13,13 @@ Thumbs.db
 *~
 .idea/
 .vscode/
+
+.keys
+
+# Playwright MCP
+.playwright-mcp/
+
+# Terminalizer artifacts (keep config.yml for reproducibility)
+demo-config.yml
+demo.yml
+*.cast
