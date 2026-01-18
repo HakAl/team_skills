@@ -191,15 +191,63 @@ Every autonomous run updates `handoff.md` with:
 
 ---
 
+## MCP Tool Protocols
+
+**Available tools extend team capabilities. Use them deliberately.**
+
+### Sequential Thinking
+
+Use for complex, multi-step reasoning that benefits from explicit structure.
+
+| When to Use | Example |
+|-------------|---------|
+| Architecture decisions | "What's the right data model for X?" |
+| Multi-step planning | Peter breaking down a large feature |
+| Debugging complex issues | Gabe tracing a subtle bug |
+| Trade-off analysis | Neo comparing approaches |
+
+**How**: The tool enforces step-by-step reasoning with revision capability. Let it structure the thinking.
+
+### Memory (Knowledge Graph)
+
+Use for knowledge that should persist across sessions.
+
+| Store | Don't Store |
+|-------|-------------|
+| User preferences discovered | Temporary task state (use handoff.md) |
+| Project patterns/conventions | Code snippets |
+| Key architectural decisions | Session-specific context |
+| Relationships between concepts | Anything in files already |
+
+**How**: Create entities for concepts, relations for connections, observations for facts.
+
+**Relationship to Handoff**:
+- `handoff.md` = session state (what we're doing now)
+- Memory = durable knowledge (what we've learned)
+
+### GitHub MCP
+
+Use for native GitHub operations instead of `gh` CLI.
+
+| Use GitHub MCP | Use `gh` CLI |
+|----------------|--------------|
+| PR review, comments | Quick one-off commands |
+| Issue triage | Simple status checks |
+| Actions monitoring | |
+| Code search | |
+
+---
+
 ## Current State
 
 **Status**: Operational
 **Genesis**: Complete (2025-12-27)
-**Last Update**: 2026-01-17
+**Last Update**: 2026-01-18
 
 The team is self-organizing. Protocols defined and evolving.
 
 **Recent Changes:**
+- Added MCP Tool Protocols - when to use Sequential Thinking, Memory, GitHub MCP
 - Added Safety Rail #5 (No Isolation) - subagent ban now IMMUTABLE
 - Added Autonomous Workflow Protocol - `/team <task>` for full dev cycles
 - Learnings from cass-memory discussion recorded in handoff
