@@ -148,8 +148,21 @@ Memory now contains initial knowledge graph:
 - `team_skills` (project) → founded by → `user`
 - `peacebinflow` (person) → engaged_with → team_skills
 
+## Scrappy PR #4 Review (2026-01-18)
+Reviewed `feature/context-management` PR using GitHub MCP:
+- Phase 1: AGENTS.md loader
+- Phase 2: RAG formatting improvements
+- Phase 3: System reminders for context drift
+
+**Verdict:** Approved and merged. Manual testing confirmed agents now pick up project patterns instead of generic boilerplate.
+
+## Milestones
+- **First external GitHub star** on team_skills (2026-01-18)
+- Dev.to: 4 reactions, 5 comments
+- 42 clones day 1
+
 ## Next Session
 - Team at full MCP capability (all tested)
-- Community engagement active
+- Community engagement active - momentum building
 - Monitor Dev.to for @peacebinflow follow-up
 - Use Memory for durable cross-session knowledge
