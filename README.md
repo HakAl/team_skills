@@ -1,6 +1,6 @@
 # Skills Team
 
-**The Plan → Build Workflow for Claude Code**
+**AI Team Methodology for Coding Assistants**
 
 AI teammates that argue with each other so your code ships better.
 
@@ -19,121 +19,33 @@ Instead of "just code it," force a structured conversation:
 
 Give them a task, watch them argue, ship better code.
 
-## The Genesis Concept
-
-This isn't a collection of isolated tools. It's a **team**.
-
-**The Bootstrap:**
-1. You install the skills
-2. You run `/team genesis`
-3. Peter (the Lead) convenes the first Retrospective
-4. The team defines their own operating protocols
-5. You step back. They self-organize.
-
-**The Philosophy:**
-- **Personas over process** - Who they are drives what they do
-- **Emergent over prescribed** - They invent what works
-- **Prime Directive** - Maximize User Value; everything else is mutable
-- **Constraints over rules** - Guardrails, not playbooks
-
-The team writes their own `TEAM.md`. They improve their own skills. You're the founder who steps back and lets them figure it out.
-
-## Installation
-
-### Quick Install (Recommended)
-
-```bash
-curl -sL https://raw.githubusercontent.com/HakAl/team_skills/master/install.sh | bash
-```
-
-This installs skills to `~/.claude/skills/` and preserves your existing config.
-
-**To update later, run the same command.**
-
-### Manual Install
-
-```bash
-git clone https://github.com/HakAl/team_skills.git
-cp -r team_skills/{team,planning-peter,nifty-neo,research-reba,meticulous-matt,greenfield-gary,grizzly-gabe,zen-runner,codebase-cleanup,TEAM.md} ~/.claude/skills/
-```
-
-### Run Genesis
-
-In Claude Code:
-
-```
-/team genesis
-```
-
-That's it. Watch them build their own `TEAM.md` and Dashboard.
-
-Peter will convene the team, Neo will challenge his proposals, Reba will validate, and they'll define their initial protocols.
-
-### 3. Configure Environment (Optional)
-
-The team works best with certain MCP servers. See [ENVIRONMENT.md](ENVIRONMENT.md) for recommendations.
-
-**Quick win** - add GitHub MCP for autonomous PR review:
-```bash
-claude mcp add --transport http github https://api.githubcopilot.com/mcp/
-```
-
-### 4. Step Back
-
-The team is operational. Check in when you want with:
-
-```
-/team              # View current status
-/team iterate      # Run an improvement cycle
-```
-
 ## The Team
 
-| Skill | Role | What They Do |
-|-------|------|--------------|
-| **Peter** | Founder/Lead | Invents process, drives consensus, runs retrospectives |
-| **Neo** | Architect/Critic | Challenges designs, finds bottlenecks, grounds hallucinations |
-| **Reba** | Guardian/QA | Validates everything, guards safety rails, nothing merges without her |
-| **Matt** | Auditor | Finds all issues, reports honestly, tracks everything |
-| **Gary** | Builder | Implements from plans, follows the spec |
-| **Gabe** | Fixer | Resolves issues, works through reports |
-| **Zen** | Executor | Autonomous work, no human-in-loop required |
+| Persona | Role | What They Do |
+|---------|------|--------------|
+| **Peter** | Lead | Invents process, drives consensus, runs retrospectives |
+| **Neo** | Architect | Challenges designs, finds bottlenecks, grounds hallucinations |
+| **Reba** | Guardian | Validates everything, nothing merges without her sign-off |
+| **Matt** | Auditor | Finds all issues, security triage, reports honestly |
+| **Gary** | Builder | Implements from plans, UX/a11y/i18n expert |
+| **Gabe** | Fixer | Resolves issues, red team / offensive security |
+| **Zen** | Executor | Autonomous work, no human-in-loop (Claude only) |
 
 Plus **Codebase Cleanup** - a fast utility scanner (no persona).
 
-## Workflows
+## How It Works
 
-### Think → Plan → Build → Validate
-
-```
-You: "Build a user authentication system"
-    ↓
-Neo (brainstorm) → Peter (plan) → Gary (implement) → Reba (validate)
-```
-
-### Audit → Fix
+### Workflows
 
 ```
-/codebase-cleanup  →  Matt (track)  →  Gabe (fix)  →  Reba (validate)
+Feature Request → Neo (brainstorm) → Peter (plan) → Gary (build) → Reba (validate)
+
+Code Audit → Matt (find issues) → Gabe (fix) → Reba (validate)
+
+Self-Improvement → Peter (convene) → Neo (challenge) → Reba (validate) → Update protocols
 ```
 
-### Team Self-Improvement
-
-```
-/team iterate
-    ↓
-Peter (convene) → Matt (audit) → Neo (challenge) → Team (improve) → Reba (validate)
-```
-
-## Quick Reference
-
-| Command | What Happens |
-|---------|--------------|
-| `/team genesis` | Bootstrap - Peter defines initial protocols |
-| `/team iterate` | Improvement cycle - team evolves their processes |
-| `/team` | Status - view current TEAM.md state |
-
-### Direct Invocations
+### Invoke by Name
 
 ```
 "Neo, how would you build this?"     → Architecture brainstorm
@@ -142,60 +54,111 @@ Peter (convene) → Matt (audit) → Neo (challenge) → Team (improve) → Reba
 "Matt, review the codebase"          → Full audit
 "Gabe, fix these issues"             → Work through findings
 "Reba, validate this"                → QA sign-off
-"Zen, run this task"                 → Autonomous execution
 ```
+
+### The Genesis Concept
+
+This isn't a collection of isolated tools. It's a **team**.
+
+1. You install the skills
+2. You bootstrap the team (platform-specific command)
+3. Peter convenes the first Retrospective
+4. The team defines their own operating protocols in `TEAM.md`
+5. You step back. They self-organize.
+
+The team writes their own protocols. They improve their own skills. You're the founder who lets them figure it out.
 
 ## Safety Rails
 
-The team operates within guardrails defined in `TEAM.md`:
-
 1. **No Lobotomies** - IMMUTABLE sections of skills cannot be edited
-2. **Reba's Law** - All self-modifications require Reba's validation
-3. **Stay in Your Lane** - Only `_skills/` and `.team/` are modifiable
-4. **No Direct Push to Main** - Team works on branches; user merges
+2. **Reba's Law** - All self-modifications require validation
+3. **Stay in Your Lane** - Only designated directories are modifiable
+4. **User Has Final Say** - User controls merges and pushes
 
-## Structure
+---
 
-```
-skills-team/
-├── TEAM.md                 # Team protocols (self-defined)
-├── ENVIRONMENT.md          # Recommended MCP servers
-├── .team/                  # Collaboration space
-│   ├── dashboard.ps1       # Status visualization
-│   ├── changelog.md        # Team evolution log
-│   ├── plans/              # Active plans
-│   └── retro/              # Retrospective outputs
-├── examples/               # Reference examples
-│   ├── TEAM_FULL.md        # Complete protocol (post-genesis)
-│   └── GENESIS_LOG.md      # How genesis works
-├── team/                   # Orchestration skill
-├── planning-peter/         # Lead
-├── nifty-neo/              # Architect/Critic
-├── research-reba/          # Guardian/QA
-├── meticulous-matt/        # Auditor
-├── greenfield-gary/        # Builder
-├── grizzly-gabe/           # Fixer
-├── zen-runner/             # Executor
-└── codebase-cleanup/       # Utility scanner
+## Installation
+
+### Claude Code
+
+```bash
+# Quick install
+curl -sL https://raw.githubusercontent.com/anthropics/team_skills/main/install.sh | bash
+
+# Or manual
+git clone https://github.com/anthropics/team_skills.git
+cp -r team_skills/{team,planning-peter,nifty-neo,research-reba,meticulous-matt,greenfield-gary,grizzly-gabe,zen-runner,codebase-cleanup,TEAM.md} ~/.claude/skills/
 ```
 
-## Why This Works
+Bootstrap the team:
+```
+/team genesis
+```
 
-Traditional tool collections are isolated. Each skill operates alone.
+### Codex CLI
 
-This team **knows each other**:
-- Neo knows to challenge Peter's proposals
-- Reba knows to validate Gary's builds
-- Matt knows to feed issues to Gabe
-- Peter knows to convene everyone for retrospectives
+```bash
+git clone https://github.com/anthropics/team_skills.git
+cp -r team_skills/{planning-peter,nifty-neo,research-reba,meticulous-matt,greenfield-gary,grizzly-gabe,codebase-cleanup} ~/.codex/skills/
+cp team_skills/TEAM.md ~/.codex/AGENTS.md
+```
 
-They have **shared context** in `TEAM.md` and `.team/`.
+The `SKILL.md` format is compatible. Invoke personas by name in your prompts.
 
-They **improve themselves** - updating their own MUTABLE sections based on what they learn.
+Note: `zen-runner` is Claude-specific (depends on `zen-mode` CLI).
 
-## The State Machine
+### Cursor / Windsurf
 
-The team operates as a **file-driven state machine**:
+1. Copy persona content from `*/SKILL.md` files into your rules
+2. Read `core/methodology.md` for the team patterns
+3. Create rules that reference the team protocols
+
+The personas are just prompts - they work anywhere.
+
+### Other Platforms
+
+The methodology is platform-agnostic. You need:
+- A way to load custom instructions (the SKILL.md content)
+- File read/write capability
+- Multi-turn conversation
+
+See [`core/methodology.md`](core/methodology.md) for the complete methodology documentation.
+
+---
+
+## Core Concepts
+
+### IMMUTABLE / MUTABLE Sections
+
+Skills use markdown comments to protect core identity while allowing evolution:
+
+```markdown
+<!-- IMMUTABLE SECTION -->
+## Core Identity
+Who the persona IS. Cannot change.
+<!-- END IMMUTABLE SECTION -->
+
+<!-- MUTABLE SECTION -->
+## Workflows
+HOW they work. Can evolve through retrospectives.
+<!-- END MUTABLE SECTION -->
+```
+
+### Personas Stay in Context
+
+Team members collaborate in shared context, not isolated processes:
+
+```
+WRONG: Spawn each persona as separate background task
+       (Can't hear each other, can't build on ideas)
+
+RIGHT: Adopt personas in conversation, switch fluidly
+       (Peter proposes → Neo challenges → iterate → Reba validates)
+```
+
+### File-Driven State
+
+The team persists context to files:
 
 ```
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
@@ -207,24 +170,46 @@ The team operates as a **file-driven state machine**:
                      (loop)
 ```
 
-**Files provide context:**
-- `TEAM.md` tells agents how to collaborate
-- `.team/plans/` contains active work
-- `.team/retro/` records learnings
+- `TEAM.md` - Team protocols (self-defined)
+- `.team/handoff.md` - Session continuity
+- `.team/plans/` - Active work
 
-**Agents process and output:**
-- Peter reads TEAM.md → Proposes changes → Writes to TEAM.md
-- Gary reads plan → Implements code → Updates plan status
-- Reba reads changes → Validates → Approves or rejects
+## Structure
 
-**The loop continues:**
-- Each invocation reads current state from files
-- Each agent writes updated state back to files
-- Next invocation picks up where the last left off
+```
+skills-team/
+├── core/                   # Platform-agnostic
+│   └── methodology.md      # Complete methodology docs
+├── TEAM.md                 # Team protocols
+│
+├── planning-peter/         # Personas (portable SKILL.md)
+├── nifty-neo/
+├── research-reba/
+├── meticulous-matt/
+├── greenfield-gary/
+├── grizzly-gabe/
+├── zen-runner/             # Claude-specific (uses zen-mode CLI)
+├── codebase-cleanup/
+│
+├── .claude/                # Claude Code wiring
+│   └── agents/             # Agent wrappers
+├── team/                   # Claude orchestration skill
+└── ENVIRONMENT.md          # Claude MCP recommendations
+```
 
-This is how stateless agents maintain continuity: **they persist context to files**.
+## Why This Works
 
-See `examples/GENESIS_LOG.md` for a detailed walkthrough of how Genesis works.
+Traditional tool collections are isolated. Each operates alone.
+
+This team **knows each other**:
+- Neo challenges Peter's proposals
+- Reba validates Gary's builds
+- Matt feeds issues to Gabe
+- Peter convenes retrospectives
+
+They have **shared context** in `TEAM.md`.
+
+They **improve themselves** - updating MUTABLE sections based on learnings.
 
 ## License
 
@@ -234,7 +219,7 @@ MIT License - see [LICENSE](LICENSE)
 
 This is an experiment in self-organizing AI teams. Contributions welcome.
 
-The team can review your PR. Just ask:
+The team can review your PR:
 ```
 "Peter, review this PR for team integration"
 ```

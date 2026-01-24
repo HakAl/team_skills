@@ -225,7 +225,7 @@ Scan the entire codebase for problems. Report ALL findings across four categorie
 
 Discovery approach:
 - Run existing linters if configured (eslint, rubocop, ruff, etc.)
-- Use Grep to find common anti-patterns (see `references/anti-patterns.md`)
+- Search for common anti-patterns (see `references/anti-patterns.md`)
 - Analyze test files for quality issues (see `references/weak-tests.md`)
 - Map dependencies to identify architectural concerns
 - Note anything that "smells off" even if not certain

@@ -46,7 +46,7 @@ Wait for answers - domain context changes what matters.
 
 ## Phase 2: Systematic Analysis
 
-Analyze each category below. Use `Grep`, `Glob`, and `Read` extensively.
+Analyze each category below. Search files by pattern and content, read code thoroughly.
 
 ### Category 1: Dead Code & Unused Exports
 
