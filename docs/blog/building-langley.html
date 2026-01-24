@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Building Langley - a Claude API traffic proxy with real-time analytics in one coding session">
+    <title>Building a Claude Traffic Proxy in One Session - The Skills Team</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <header class="hero hero-small">
+        <h1>Building a Claude Traffic Proxy in One Session</h1>
+        <p class="blog-meta">January 2026</p>
+        <p><a href="./">← Back to blog</a></p>
+    </header>
+
+    <main>
+        <article class="section blog-post">
+            <p>I wanted to track how much my Claude API usage was actually costing me. Not the billing page estimate - the real cost. Per request. Per task. Per tool call.</p>
+
+            <p>So I built Langley: an intercepting proxy that captures every Claude API request, extracts token usage, calculates costs, and shows it all in real-time. In one coding session.</p>
+
+            <h2>The Problem</h2>
+
+            <p>Claude's billing shows monthly totals. Helpful, but useless for:</p>
+
+            <ul>
+                <li><strong>Debugging</strong> - "Why did this task cost $5?"</li>
+                <li><strong>Optimization</strong> - "Which tool is eating my context?"</li>
+                <li><strong>Accountability</strong> - "What's this project actually costing?"</li>
+            </ul>
+
+            <p>I needed request-level visibility. Something that sits between my code and Claude, captures everything, and gives me analytics.</p>
+
+            <h2>The Architecture</h2>
+
+            <p>Langley is a TLS-intercepting proxy. Traffic flows through it transparently:</p>
+
+<pre><code>Your App -> HTTPS -> Langley -> HTTPS -> Claude API
+                        |
+                        v
+                   SQLite DB
+                        |
+                        v
+                   Dashboard</code></pre>
+
+            <p>It generates certificates on-the-fly, captures request/response pairs, parses Claude's SSE streams, extracts token counts, and calculates costs using a pricing table.</p>
+
+            <p>The dashboard shows:</p>
+            <ul>
+                <li>Real-time flow list (WebSocket updates)</li>
+                <li>Token counts and costs per request</li>
+                <li>Analytics by task, by tool, by day</li>
+                <li>Anomaly detection (large contexts, slow responses, retries)</li>
+            </ul>
+
+            <h2>What Made It Work</h2>
+
+            <h3>1. Security From the Start</h3>
+
+            <p>Before writing code, we did a security analysis. Matt (our auditor persona) found 10 issues to address:</p>
+
+            <ul>
+                <li>Credential redaction on write (never store API keys)</li>
+                <li>Upstream TLS validation (no self-signed upstream)</li>
+                <li>CA key permissions (0600, not world-readable)</li>
+                <li>Random certificate serials (not predictable)</li>
+                <li>LRU cert cache (prevent memory exhaustion)</li>
+            </ul>
+
+            <p>These weren't afterthoughts - they shaped the design.</p>
+
+            <h3>2. Phased Implementation</h3>
+
+            <p>We broke the work into phases:</p>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Phase</th>
+                        <th>Deliverable</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>0</td>
+                        <td>Basic HTTP proxy that forwards requests</td>
+                    </tr>
+                    <tr>
+                        <td>1</td>
+                        <td>TLS interception, SQLite persistence</td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td>REST API, WebSocket server, basic UI</td>
+                    </tr>
+                    <tr>
+                        <td>3</td>
+                        <td>Token extraction, cost calculation, analytics</td>
+                    </tr>
+                    <tr>
+                        <td>4</td>
+                        <td>Full dashboard with filtering and charts</td>
+                    </tr>
+                    <tr>
+                        <td>5</td>
+                        <td>Polish, documentation, blog</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>Each phase built on the last. Each had a clear deliverable.</p>
+
+            <h3>3. Right-Sized Technology</h3>
+
+            <ul>
+                <li><strong>Go</strong> - Single binary, easy deployment, great TLS libraries</li>
+                <li><strong>SQLite</strong> - No server needed, WAL mode for concurrent reads</li>
+                <li><strong>React</strong> - Just works, Vite for fast builds</li>
+                <li><strong>WebSocket</strong> - Real-time without polling</li>
+            </ul>
+
+            <p>No Kubernetes. No Postgres. No microservices. Just the minimum to solve the problem.</p>
+
+            <h2>The Tricky Parts</h2>
+
+            <h3>SSE Parsing</h3>
+
+            <p>Claude's streaming API uses Server-Sent Events. Token counts come in <code>message_start</code> and <code>message_delta</code> events, scattered across the stream. The parser accumulates them correctly:</p>
+
+<pre><code>case "message_start":
+    // Extract input tokens from initial message
+    if usage := msg["usage"]; usage != nil {
+        flow.InputTokens = usage["input_tokens"]
+    }
+
+case "message_delta":
+    // Extract output tokens from final delta
+    if usage := event["usage"]; usage != nil {
+        flow.OutputTokens = usage["output_tokens"]
+    }</code></pre>
+
+            <h3>Task Grouping</h3>
+
+            <p>Requests don't come with "task" labels. We infer them:</p>
+
+            <ol>
+                <li>Explicit <code>X-Langley-Task</code> header (if you add it)</li>
+                <li>User ID from the request body's metadata</li>
+                <li>Same host with 5-minute gap (new task starts)</li>
+            </ol>
+
+            <p>This groups related requests together for per-task analytics.</p>
+
+            <h3>Anomaly Detection</h3>
+
+            <p>The system flags:</p>
+            <ul>
+                <li>Large contexts (&gt;100k input tokens)</li>
+                <li>Slow responses (&gt;30 seconds)</li>
+                <li>Rapid repeats (same endpoint, short window = likely retries)</li>
+                <li>High single-request cost (&gt;$1)</li>
+                <li>Tool failures</li>
+            </ul>
+
+            <p>These help catch runaway loops and inefficient prompts.</p>
+
+            <h2>The Result</h2>
+
+            <p>Langley is about 2,000 lines of Go and 600 lines of React. It:</p>
+
+            <ul>
+                <li>Intercepts HTTPS traffic transparently</li>
+                <li>Redacts credentials before storage</li>
+                <li>Extracts token usage from SSE streams</li>
+                <li>Calculates costs using model-specific pricing</li>
+                <li>Shows real-time analytics in a dashboard</li>
+                <li>Detects anomalies automatically</li>
+            </ul>
+
+            <p>All without requiring any changes to your Claude client code. Just set <code>HTTPS_PROXY</code> and you're capturing.</p>
+
+            <h2>What I Learned</h2>
+
+            <p><strong>Plan before code.</strong> We spent time on a security analysis and phased plan before writing implementation code. The plan survived contact with reality - the phases worked as scoped.</p>
+
+            <p><strong>Simple architecture wins.</strong> SQLite handles everything. No external dependencies. Deploys as a single binary (once built with embedded frontend).</p>
+
+            <p><strong>Real-time matters.</strong> The WebSocket updates make debugging feel immediate. Polling would have worked but felt sluggish.</p>
+
+            <h2>Try It</h2>
+
+            <p>The code is at <a href="https://github.com/HakAl/langley">github.com/HakAl/langley</a>.</p>
+
+<pre><code># Build
+go build -o langley ./cmd/langley
+
+# Trust the CA (see langley -show-ca)
+# Run
+./langley
+
+# Set proxy
+export HTTPS_PROXY=http://localhost:9090
+
+# Open dashboard
+# http://localhost:9091</code></pre>
+
+            <p>Now you can see exactly what Claude is doing with your tokens.</p>
+
+            <hr>
+
+            <p><em>Built by the team in one session. Peter planned, Neo critiqued the architecture, Gary implemented, Reba validated. Langley watches them all now.</em></p>
+        </article>
+    </main>
+
+    <footer>
+        <p>
+            <a href="https://github.com/HakAl/team_skills">GitHub</a> ·
+            <a href="../">Home</a> ·
+            Built by the Skills Team
+        </p>
+    </footer>
+</body>
+</html>
