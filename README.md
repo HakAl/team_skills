@@ -171,7 +171,7 @@ The team persists context to files:
 
 ```
 ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
-│   Files     │ ──▶ │   Agents    │ ──▶ │   Files     │
+│   Files     │ ──> │   Agents    │ ──> │   Files     │
 │  (context)  │     │  (process)  │     │  (output)   │
 └─────────────┘     └─────────────┘     └─────────────┘
        │                   │                   │
