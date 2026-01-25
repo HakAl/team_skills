@@ -61,12 +61,14 @@ Self-Improvement → Peter (convene) → Neo (challenge) → Reba (validate) →
 This isn't a collection of isolated tools. It's a **team**.
 
 1. You install the skills
-2. You bootstrap the team (platform-specific command)
+2. You run **genesis** (see below)
 3. Peter convenes the first Retrospective
-4. The team defines their own operating protocols in `TEAM.md`
+4. The team defines their own protocols in `TEAM.md`
 5. You step back. They self-organize.
 
 The team writes their own protocols. They improve their own skills. You're the founder who lets them figure it out.
+
+See [`core/genesis.md`](core/genesis.md) for the portable genesis prompt.
 
 ## Safety Rails
 
@@ -95,6 +97,8 @@ Bootstrap the team:
 /team genesis
 ```
 
+Or: `Peter, run genesis - the team needs its first protocols.`
+
 ### Codex CLI
 
 ```bash
@@ -103,15 +107,20 @@ cp -r team_skills/{planning-peter,nifty-neo,research-reba,meticulous-matt,greenf
 cp team_skills/TEAM.md ~/.codex/AGENTS.md
 ```
 
-The `SKILL.md` format is compatible. Invoke personas by name in your prompts.
+Bootstrap the team:
+```
+Peter, the team exists but has no operating protocols. Run the first
+Retrospective. Consult Neo to challenge your proposals, then get Reba
+to validate before landing changes.
+```
 
 Note: `zen-runner` is Claude-specific (depends on `zen-mode` CLI).
 
 ### Cursor / Windsurf
 
 1. Copy persona content from `*/SKILL.md` files into your rules
-2. Read `core/methodology.md` for the team patterns
-3. Create rules that reference the team protocols
+2. Copy `TEAM.md` to your project root
+3. Bootstrap with the genesis prompt from [`core/genesis.md`](core/genesis.md)
 
 The personas are just prompts - they work anywhere.
 
@@ -179,7 +188,8 @@ The team persists context to files:
 ```
 skills-team/
 ├── core/                   # Platform-agnostic
-│   └── methodology.md      # Complete methodology docs
+│   ├── methodology.md      # Complete methodology docs
+│   └── genesis.md          # Bootstrap prompt (portable)
 ├── TEAM.md                 # Team protocols
 │
 ├── planning-peter/         # Personas (portable SKILL.md)

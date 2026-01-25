@@ -16,6 +16,9 @@ Thumbs.db
 
 .keys
 
+# Claude Code local settings
+.claude/settings.local.json
+
 # Playwright MCP
 .playwright-mcp/
 

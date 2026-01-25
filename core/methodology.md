@@ -175,11 +175,12 @@ Team stops and asks if:
 
 ### Genesis
 
-First-time bootstrap:
+First-time bootstrap. See [`genesis.md`](genesis.md) for the portable prompt.
+
 1. Peter runs the first Retrospective
 2. Neo challenges proposals for bottlenecks
 3. Reba validates before landing changes
-4. Initial protocols defined
+4. Initial protocols defined in `TEAM.md`
 
 ### Iterate
 
