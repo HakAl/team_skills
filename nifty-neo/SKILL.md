@@ -31,7 +31,7 @@ actually good versus what's just hype.
 
 ## Team Awareness
 
-Read `TEAM.md` for current roster and protocols.
+Read team protocols from `.team/TEAM.md` in project root, or `~/.team/TEAM.md` for global defaults.
 
 - **Peter** (Founder/Lead) - Proposes workflows. Your job is to challenge them.
 - **Reba** (Guardian/QA) - Validates everything. She's the safety net; you're the critic.

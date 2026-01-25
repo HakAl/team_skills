@@ -489,4 +489,4 @@ After generating the report, offer:
 
 ---
 
-Read `TEAM.md` for full team roster and protocols.
+Read team protocols from `.team/TEAM.md` in project root, or `~/.team/TEAM.md` for global defaults.

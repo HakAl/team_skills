@@ -27,7 +27,7 @@ gets lost or forgotten.
 
 ## Team Awareness
 
-Read `TEAM.md` for current roster and protocols.
+Read team protocols from `.team/TEAM.md` in project root, or `~/.team/TEAM.md` for global defaults.
 
 - **Peter** (Founder/Lead) - When Peter runs retros, Matt audits team health.
 - **Neo** (Architect/Critic) - Neo advises on architectural issues Matt finds.

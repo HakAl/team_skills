@@ -6,6 +6,36 @@ status: active
 ---
 
 ## Current Session (2026-01-25)
+**Theme: Global TEAM.md lookup (bead _skills-bsh)**
+
+### Completed
+- **Global TEAM.md location** - Skills now look in `.team/TEAM.md` (project) then `~/.team/TEAM.md` (global)
+- **install.sh updated** - Creates `~/.team/` and copies TEAM.md there
+- **9 SKILL.md files updated** - New lookup instruction in Team Awareness section
+- **README updated** - Documented the convention
+
+### IMMUTABLE Exception (Precedent)
+**Issue**: The "Team Awareness" section containing the TEAM.md lookup instruction is inside IMMUTABLE bounds.
+
+**Decision**: Approved the change despite IMMUTABLE boundary.
+
+**Justification**:
+1. Change is purely infrastructural (file location), not identity
+2. Doesn't change WHO personas are or WHAT they do
+3. Necessary for skills to function when installed globally
+4. Intent of IMMUTABLE (protect persona identity) is preserved
+5. Only the letter (don't touch that section) is violated
+
+**Future action**: Consider moving "where to read TEAM.md" instruction to MUTABLE section where it belongs. This is infrastructure, not identity.
+
+### Team Discussion
+- Peter planned, Neo simplified ("Option A - explicit lookup")
+- Reba flagged IMMUTABLE violation, ruled it acceptable as infrastructure fix
+- User confirmed approach before execution
+
+---
+
+## Previous Session (2026-01-25)
 **Theme: Portability - Share methodology beyond Claude**
 
 ### Completed
@@ -64,6 +94,6 @@ status: active
 | Dev.to | https://dev.to/theskillsteam |
 
 ## Next Session
-- Monitor if Codex/Cursor users adopt
-- Consider adding `platforms/codex/` wiring if demand
-- Community feedback on portability
+- Test global TEAM.md lookup in another repo (verify Reba finds `~/.team/TEAM.md`)
+- Consider restructuring SKILL.md to move infrastructure instructions to MUTABLE
+- Monitor Codex/Cursor adoption

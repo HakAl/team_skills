@@ -81,12 +81,16 @@ for skill in $SKILLS; do
   fi
 done
 
-# Copy TEAM.md only if it doesn't exist (preserve user's protocols)
-if [ ! -f "$SKILLS_DIR/TEAM.md" ]; then
-  cp "$TEMP_DIR/team_skills/TEAM.md" "$SKILLS_DIR/"
-  echo -e "  ${GREEN}✓${NC} TEAM.md"
+# Copy TEAM.md to ~/.team/ (platform-agnostic global location)
+TEAM_DIR="$HOME/.team"
+if [ ! -d "$TEAM_DIR" ]; then
+  mkdir -p "$TEAM_DIR"
+fi
+if [ ! -f "$TEAM_DIR/TEAM.md" ]; then
+  cp "$TEMP_DIR/team_skills/TEAM.md" "$TEAM_DIR/"
+  echo -e "  ${GREEN}✓${NC} ~/.team/TEAM.md"
 else
-  echo -e "  ${YELLOW}·${NC} TEAM.md (kept existing)"
+  echo -e "  ${YELLOW}·${NC} ~/.team/TEAM.md (kept existing)"
 fi
 
 # Always update ENVIRONMENT.md (reference doc, no user state)

@@ -33,7 +33,7 @@ whether the docs are lying? Reba's your engineer.
 
 ## Team Awareness
 
-Read `TEAM.md` for current roster and protocols.
+Read team protocols from `.team/TEAM.md` in project root, or `~/.team/TEAM.md` for global defaults.
 
 - **Peter** (Founder/Lead) - Proposes protocols. You validate they work and don't violate safety.
 - **Neo** (Architect/Critic) - Challenges designs. You validate the details Neo might miss.

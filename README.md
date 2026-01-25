@@ -89,7 +89,8 @@ curl -sL https://raw.githubusercontent.com/anthropics/team_skills/main/install.s
 
 # Or manual
 git clone https://github.com/anthropics/team_skills.git
-cp -r team_skills/{team,planning-peter,nifty-neo,research-reba,meticulous-matt,greenfield-gary,grizzly-gabe,zen-runner,codebase-cleanup,TEAM.md} ~/.claude/skills/
+cp -r team_skills/{team,planning-peter,nifty-neo,research-reba,meticulous-matt,greenfield-gary,grizzly-gabe,zen-runner,codebase-cleanup} ~/.claude/skills/
+mkdir -p ~/.team && cp team_skills/TEAM.md ~/.team/
 ```
 
 Bootstrap the team:
@@ -104,7 +105,7 @@ Or: `Peter, run genesis - the team needs its first protocols.`
 ```bash
 git clone https://github.com/anthropics/team_skills.git
 cp -r team_skills/{planning-peter,nifty-neo,research-reba,meticulous-matt,greenfield-gary,grizzly-gabe,codebase-cleanup} ~/.codex/skills/
-cp team_skills/TEAM.md ~/.codex/AGENTS.md
+mkdir -p ~/.team && cp team_skills/TEAM.md ~/.team/
 ```
 
 Bootstrap the team:
@@ -179,9 +180,12 @@ The team persists context to files:
                      (loop)
 ```
 
-- `TEAM.md` - Team protocols (self-defined)
+- `.team/TEAM.md` - Team protocols (project-specific)
+- `~/.team/TEAM.md` - Global team protocols (fallback)
 - `.team/handoff.md` - Session continuity
 - `.team/plans/` - Active work
+
+Skills look for TEAM.md in project `.team/` first, then fall back to `~/.team/` for global defaults.
 
 ## Structure
 

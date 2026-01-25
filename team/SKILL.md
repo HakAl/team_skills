@@ -103,7 +103,7 @@ Run the install commands above, then restart Claude Code.
 
 When invoked, this skill should:
 
-1. **Read context**: Load `TEAM.md` to understand current state
+1. **Read context**: Load team protocols from `.team/TEAM.md` in project root, or `~/.team/TEAM.md` for global defaults
 2. **Invoke Peter**: Use the planning-peter skill with appropriate context
 3. **Let Peter lead**: Don't micromanage - Peter decides how to run the team
 
