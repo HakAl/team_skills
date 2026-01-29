@@ -1,11 +1,50 @@
 # Session Handoff
 
 ---
-last_session: 2026-01-25
+last_session: 2026-01-29
 status: active
 ---
 
-## Current Session (2026-01-25)
+## Current Session (2026-01-29)
+**Theme: Research-backed cold critic agent (bead _skills-fcu)**
+
+### Completed
+- **Research survey** — 7+ papers on multi-agent debate, self-preference bias, hybrid routing
+- **Feature design** — Neo spawns anonymous Task agent for adversarial plan review, interprets in context
+- **Neo SKILL.md updated** — Cold Critic Mode added to MUTABLE section (lines 188-231)
+- **Two beads created** — _skills-fcu (feature, P2), _skills-wx1 (blog article, P3, blocked by fcu)
+- **Memory updated** — Cold Critic Mode entity with full research basis
+
+### Key Research Findings
+- Models rate own output higher (arxiv 2404.13076) — self-preference bias
+- Authorship visibility increases self-voting (arxiv 2509.23537) — strongest evidence for context isolation
+- Multiagent debate improves reasoning (Du et al., ICML 2024) — foundational
+- Hybrid routing optimal (arxiv 2505.18286) — don't use universally
+- Counterpoint: multi-persona may match multi-agent (arxiv 2601.15488) — mitigated by Neo interpreting in context
+
+### Design Decisions
+- Neo decides when to spawn (not Peter) — avoids self-preference in trigger decision
+- Cold agent is anonymous (non-persona agent type) — not Neo-in-exile
+- Trigger is comfort ("agreeing too easily"), not complexity threshold
+- No TEAM.md changes — Rail #5 intact, this is Neo using a tool
+- Principles over templates — Neo crafts prompts per situation
+
+### Team Discussion
+- User cited two arxiv papers, asked about multi-agent planning
+- Analysis revealed first paper (2404.13076) was about self-preference, not planning — but relevance holds via extrapolation
+- User proposed Neo runs the agent herself (preserves context) — key insight
+- Peter caught wrong subagent type (was "nifty-neo", corrected to non-persona)
+- Neo pushed for principles over rigid template, comfort-based trigger
+- Reba reviewed: approved, two nits (subagent type hardcoding, bare arxiv IDs) — both fixed
+- Reba confirmed IMMUTABLE section untouched
+
+### Open
+- [ ] Test cold critic on a real plan (acceptance criteria from bead)
+- [ ] Blog article (_skills-wx1) — blocked until feature is tested with real data
+
+---
+
+## Previous Session (2026-01-25)
 **Theme: Global TEAM.md lookup (bead _skills-bsh)**
 
 ### Completed
