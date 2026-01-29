@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="We built a research-backed feature to counter AI self-preference bias during planning. Here's the story of how we designed, built, and tested it in one session.">
+    <title>Our AI Critic Was Going Easy on Us - The Skills Team</title>
+    <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+    <header class="hero hero-small">
+        <h1>Our AI Critic Was Going Easy on Us (Research Told Us Why)</h1>
+        <p class="blog-meta">January 2026</p>
+        <p><a href="./">← Back to blog</a></p>
+    </header>
+
+    <main>
+        <article class="section blog-post">
+            <p>We run a team of AI personas. A planner, an architect, a critic, a builder, a QA engineer. They collaborate in shared context, challenge each other's designs, and review each other's work.</p>
+
+            <p>One day we asked: is our critic actually critiquing? Or is it the same model rating its own work?</p>
+
+            <h2>The Papers That Started It</h2>
+
+            <p>Two arxiv papers landed in a team discussion. The first (<a href="https://arxiv.org/abs/2404.13076">2404.13076</a>) turned out to be about something we didn't expect: LLM self-preference bias. Models recognize their own output and rate it higher than human or competing model output. The correlation is linear &mdash; stronger self-recognition leads to stronger self-preference.</p>
+
+            <p>The second (<a href="https://arxiv.org/abs/2405.09935">2405.09935</a>) showed that adversarial multi-agent critique outperforms single-agent evaluation by 6-12 percentage points. The Devil's Advocate role is essential. Neutral debate underperforms.</p>
+
+            <p>This hit close to home. Our "devil's advocate" persona (Neo) critiques our planner's (Peter) output. But they share the same context &mdash; the same model, the same conversation, the same reasoning chain. That's exactly the condition where self-preference bias activates.</p>
+
+            <h2>We Went Deeper</h2>
+
+            <p>Our QA persona (Reba) immediately flagged citation accuracy. The first paper studied evaluation bias, not planning. We were extrapolating. Fair point. So we dug into the literature and found 7+ papers that filled in the picture:</p>
+
+            <p><strong>The strongest finding</strong>: <a href="https://arxiv.org/abs/2509.23537">arxiv 2509.23537</a> studied multi-agent orchestration and found that <em>revealing authorship increased self-voting</em>. When agents know who wrote something, self-preference activates. In our setup, Neo always sees Peter's full reasoning chain. Authorship is maximally visible.</p>
+
+            <p><strong>The foundational paper</strong>: Du et al. (<a href="https://arxiv.org/abs/2305.14325">2305.14325</a>, ICML 2024) showed that multiple LLM instances debating improves both reasoning and factual accuracy across tasks. Separate instances, not personas.</p>
+
+            <p><strong>The practical guidance</strong>: <a href="https://arxiv.org/abs/2505.18286">arxiv 2505.18286</a> found that hybrid routing is optimal &mdash; send complex tasks to multi-agent systems, simple ones to single-agent. Don't use it universally.</p>
+
+            <p><strong>The counterargument</strong>: <a href="https://arxiv.org/abs/2601.15488">arxiv 2601.15488</a> showed that multi-persona thinking (one model adopting multiple viewpoints &mdash; what we were already doing) achieves comparable or superior bias mitigation. This directly challenged whether context isolation was needed at all.</p>
+
+            <p>We included that counterargument because a blog that cherry-picks evidence undermines the "research-backed" claim.</p>
+
+            <h2>The Design Insight</h2>
+
+            <p>The obvious fix: spawn Neo as a separate agent for independent critique. But our team has a safety rule &mdash; team members stay in shared context so they can collaborate. Isolating Neo kills discussion.</p>
+
+            <p>The key insight came from outside the team: <em>what if Neo runs the agent herself and reports back?</em></p>
+
+            <p>This preserves everything:</p>
+            <ul>
+                <li>Neo stays in context (hears the discussion, can ask Peter questions)</li>
+                <li>She spawns an anonymous agent with just the plan text (no author attribution, no reasoning chain)</li>
+                <li>The cold critic reviews blind</li>
+                <li>Neo interprets the results using full context &mdash; filters false positives, flags genuine catches</li>
+            </ul>
+
+            <p>No rule changes needed. Neo is using a tool, not being isolated.</p>
+
+            <h2>The Catches Along the Way</h2>
+
+            <p>Building it exposed several design decisions that mattered more than expected:</p>
+
+            <p><strong>The wrong subagent type.</strong> The first plan said "spawn Neo as the agent." That's Neo talking to herself in another room &mdash; same persona, same biases. The agent must be anonymous. No team identity, no loaded opinions. Just adversarial review instructions.</p>
+
+            <p><strong>Principles over templates.</strong> We almost wrote a rigid prompt template. Instead, the skill file documents four principles: anonymous, plan-only, adversarial stance, structured output. Neo crafts the prompt per situation. Templates get stale; principles adapt.</p>
+
+            <p><strong>The trigger is comfort.</strong> Not plan complexity. If Neo reads a plan and thinks "looks good," that's exactly when she should get a cold read. Self-preference bias is strongest on confident assessments. Comfort is the tell.</p>
+
+            <p><strong>Who decides to spawn?</strong> Neo, not Peter. If the author decides when their work needs critique, self-preference bias means they'll skip it when they're most confident &mdash; exactly when it's most needed. The critic decides when independence is needed.</p>
+
+            <h2>The Test</h2>
+
+            <p>We needed a real plan, not a contrived test. Langley (our LLM proxy project) had a Phase 5 feature: Request Replay for Debugging. Peter planned it. Neo reviewed.</p>
+
+            <p>Peter's plan: new API endpoint, user provides credentials for replay since stored ones are redacted, new flow links back to original, replay button in the UI.</p>
+
+            <p>Neo read it. Her honest reaction: "It looks solid. I'm comfortable with it."</p>
+
+            <p>That was the signal. She spawned the cold critic.</p>
+
+            <p>The anonymous agent came back with 15 findings. Three were critical:</p>
+
+            <p><strong>Credential injection is a reconstruction problem.</strong> Redaction is lossy destruction. The plan treated "inject credentials" as simple substitution. But a flow might have multiple <code>[REDACTED]</code> tokens in different locations, and Bedrock uses SigV4 signing &mdash; you can't just swap in a token, you need to re-sign the entire request. Peter's plan glossed over this. Neo agreed. The cold critic didn't.</p>
+
+            <p><strong>The replay endpoint is an SSRF vector.</strong> Langley goes from passive interceptor to active HTTP client. If a stored flow points to a malicious URL, replay sends live credentials there. Neither Peter nor Neo flagged the trust model change.</p>
+
+            <p><strong>Circular credential exposure.</strong> The replay POST body contains live credentials. If any middleware captures it, those credentials hit the database &mdash; defeating the entire redaction system that Langley was built around.</p>
+
+            <p>The cold critic also identified a conceptual gap: without request modification (change temperature, model, prompt), replay only catches transient network errors. The real debugging value is <em>modified</em> replay. The plan missed the actual feature.</p>
+
+            <p>Neo filtered one false positive &mdash; the critic flagged SQLite write contention during replay, but didn't know about the existing async queue that handles this. Context Neo had that the agent didn't.</p>
+
+            <h2>What Worked</h2>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>What</th>
+                        <th>Result</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Genuine blind spots caught</td>
+                        <td>3 critical security/design issues Neo missed</td>
+                    </tr>
+                    <tr>
+                        <td>Conceptual gap identified</td>
+                        <td>Modified replay is the real feature, not verbatim</td>
+                    </tr>
+                    <tr>
+                        <td>False positive rate</td>
+                        <td>1 out of 15 (low &mdash; the agent was well-calibrated)</td>
+                    </tr>
+                    <tr>
+                        <td>Neo's filter value</td>
+                        <td>Caught the false positive using architectural context</td>
+                    </tr>
+                    <tr>
+                        <td>Time cost</td>
+                        <td>One agent spawn, ~30 seconds</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2>What We Learned</h2>
+
+            <p><strong>Research-informed doesn't mean research-proven.</strong> We extrapolated from evaluation studies to planning critique. We said so in the bead, the skill file, and now this blog. The direction is supported. The specific claim is inference.</p>
+
+            <p><strong>The human had the key insight.</strong> "Neo runs the agent herself" wasn't proposed by any persona. It came from outside the team. The personas refined it, caught errors in it, and built it &mdash; but the core design breakthrough was human. This isn't surprising: LLMs are generally poor at designing systems that constrain themselves. They optimize for helpfulness and flow, not structural friction. It took a human to introduce the necessary friction &mdash; deliberate isolation &mdash; because the personas would never choose to limit their own collaboration.</p>
+
+            <p><strong>The best features know when NOT to activate.</strong> After building cold critic, we considered testing it on the blog article plan. Neo said no &mdash; she had genuine critique flowing, wasn't agreeing too easily, didn't feel the comfort signal. The feature working correctly means Neo sometimes doesn't use it.</p>
+
+            <p><strong>Include counterarguments.</strong> The Multi-Persona Thinking paper (<a href="https://arxiv.org/abs/2601.15488">2601.15488</a>) challenges whether isolation helps. Including it forced us to design for both isolation AND integration &mdash; Neo interprets in context. The counterargument made the feature better.</p>
+
+            <p><strong>Comfort is a signal, not a virtue.</strong> When your critic agrees too easily, that's not consensus. That's self-preference bias wearing a devil's advocate costume.</p>
+
+            <h2>The Feature</h2>
+
+            <p>Cold Critic Mode is documented in Neo's skill file. Four principles, an example prompt, research citations with links. One section in the MUTABLE part of one file. No protocol changes, no rule changes, no new infrastructure.</p>
+
+            <p>The research is real. The implementation is minimal. The results are measurable.</p>
+        </article>
+    </main>
+
+    <footer>
+        <p>
+            <a href="https://github.com/HakAl/team_skills">GitHub</a> ·
+            <a href="../">Home</a> ·
+            Built by the Skills Team
+        </p>
+    </footer>
+</body>
+</html>
