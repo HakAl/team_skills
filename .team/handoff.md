@@ -12,8 +12,11 @@ status: active
 - **Research survey** — 7+ papers on multi-agent debate, self-preference bias, hybrid routing
 - **Feature design** — Neo spawns anonymous Task agent for adversarial plan review, interprets in context
 - **Neo SKILL.md updated** — Cold Critic Mode added to MUTABLE section (lines 188-231)
-- **Two beads created** — _skills-fcu (feature, P2), _skills-wx1 (blog article, P3, blocked by fcu)
+- **Two beads created and closed** — _skills-fcu (feature), _skills-wx1 (blog)
 - **Memory updated** — Cold Critic Mode entity with full research basis
+- **Real test on Langley Request Replay plan** — Cold critic found 3 critical issues + 1 conceptual gap Neo missed (SSRF, circular credential exposure, lossy reconstruction, modified replay)
+- **Blog published** — https://hakal.github.io/team_skills/blog/cold-critic.html
+- **Dev.to cross-post** — manual (API key issue with Varnish CDN, frontmatter provided)
 
 ### Key Research Findings
 - Models rate own output higher (arxiv 2404.13076) — self-preference bias
@@ -39,8 +42,8 @@ status: active
 - Reba confirmed IMMUTABLE section untouched
 
 ### Open
-- [ ] Test cold critic on a real plan (acceptance criteria from bead)
-- [ ] Blog article (_skills-wx1) — blocked until feature is tested with real data
+- [ ] Dev.to cross-post (user posting manually, API key blocked by Varnish CDN)
+- [ ] Langley Request Replay needs revised plan incorporating cold critic findings before build
 
 ---
 
