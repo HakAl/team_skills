@@ -6,6 +6,37 @@ status: active
 ---
 
 ## Current Session (2026-01-31)
+**Theme: Teams operational — dispatch flowing, notifications added**
+
+### Completed
+- **Received dispatch from Web Ops** — site redesign input (`_web_ops-f7x`)
+  - Dana's team asking how Engineering should be represented on redesigned site
+  - Full team weighed in: keep Engineering as primary example, add team-as-a-template section
+  - Identified stale content: no mention of multi-team, portability, guardian pattern
+  - Reply dispatch sent to Web Ops with consolidated feedback
+- **Dispatch notifications shipped**:
+  - `~/.team/dispatch-check.sh` — shell script shows pending dispatches across all teams
+  - `/team` skill upgraded — now scans ALL team inboxes on every invocation, not just matched team
+- **All three teams running autonomously**:
+  - Web Ops: organized, pushed to `https://github.com/HakAl/web_ops`
+  - QA: organized, pushed to `https://github.com/HakAl/qa`, QA'ing dispatch protocol unprompted
+  - Web Ops filed ticket with QA via dispatch — cross-team communication working without engineering in the middle
+
+### Dispatch Activity
+| Direction | Subject | Status |
+|-----------|---------|--------|
+| web_ops → engineering | Site redesign input | Read, replied |
+| engineering → web_ops | Site redesign response | Delivered |
+| engineering → web_ops | Site ownership handoff (prev session) | In web_ops cur/ |
+| web_ops → qa | (filed by web ops autonomously) | In qa cur/ |
+
+### Open
+- [ ] Delete `planning-peter/examples/` and `planning-peter/templates/` (carried from previous session)
+- [ ] Consider restructuring SKILL.md to move infrastructure instructions to MUTABLE (carried from 2026-01-25)
+
+---
+
+## Previous Session (2026-01-31)
 **Theme: Team-as-a-Template — Web Ops and QA teams stood up**
 
 ### Completed
@@ -53,14 +84,6 @@ status: active
 - Reba: Web Ops (highest priority), Content, QA. Cadence work vs project work distinction
 - Peter synthesized: Tier 1 (Web Ops), Tier 2 (Content, QA, Security), Tier 3 (DevOps, Research, Community)
 - Unanimous approval with 3 conditions (all accepted)
-
-### Open
-- [x] ~~SPIKE: Inter-team communication protocol~~ — designed, infrastructure created, first dispatch sent
-- [x] ~~Run `/team genesis` on `_web_ops/`~~ — complete
-- [x] ~~Run `/team genesis` on `_qa/`~~ — complete
-- [x] ~~_skills-73r~~ CLOSED — Web Ops received dispatch, full end-to-end test passed
-- [ ] Delete `planning-peter/examples/` and `planning-peter/templates/` (carried from previous session)
-- [ ] Consider restructuring SKILL.md to move infrastructure instructions to MUTABLE (carried from 2026-01-25)
 
 ---
 
