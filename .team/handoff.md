@@ -6,6 +6,65 @@ status: active
 ---
 
 ## Current Session (2026-01-31)
+**Theme: Team-as-a-Template — Web Ops and QA teams stood up**
+
+### Completed
+- **Team discussion** — All 5 engineering personas consulted on what teams they need
+- **Consensus reached** — Web Ops (unanimous), QA & Compliance (strong support)
+- **Web Ops team created** (`_web_ops/`):
+  - 6 personas: Director Dana, Discerning Dee, Builder Blake, Narrative Nora, Analytic Ari, Guardian Grace
+  - SKILL.md files created in `~/.claude/skills/`
+  - TEAM.md updated with Grace's Law, new roster
+  - team/SKILL.md orchestration references Dana
+  - AGENTS.md updated for web ops context
+- **QA & Compliance team created** (`_qa/`):
+  - 5 personas: Captain Cora, Sentinel Sam, CrossCheck Charlie, Compliance Clara, Regression Rex
+  - SKILL.md files created in `~/.claude/skills/`
+  - TEAM.md updated with Clara's Law, new roster
+  - team/SKILL.md orchestration references Cora
+  - AGENTS.md updated for QA context
+- **Both repos** forked from team_skills, genesis complete
+- **Dispatch protocol designed** (_skills-73r):
+  - Research spike: blackboard pattern, Maildir lifecycle, polling validated
+  - Protocol written to `.team/designs/dispatch-protocol.md`
+  - Distributed to all 3 repos + `~/.team/dispatch-protocol.md`
+  - Infrastructure created: `~/.team/dispatch/{engineering,web_ops,qa}/{tmp,new,cur}`
+- **`/team` skill upgraded** to multi-team dispatcher (routes by working directory)
+- **First dispatch sent** — engineering → web_ops: site ownership handoff
+  - Tests Maildir lifecycle (tmp→new rename worked on Windows/NTFS)
+  - Research at `.team/research/inter-team-communication.md`
+
+### Key Design Decisions
+- **Team-as-a-template** — fork team_skills, swap personas, run genesis. The pattern IS the product
+- **No template abstraction layer** — Neo vetoed. Fork, swap, genesis. Keep it simple
+- **Skills in ~/.claude/skills/** — all teams share the central skills directory
+- **Each team has its own guardian** — Grace (Web Ops), Clara (QA), Reba (Engineering)
+- **Safety Rails adapt per team** — "Reba's Law" → "Grace's Law" / "Clara's Law"
+- **Genesis bootstraps process** — we define WHO (personas), the team defines HOW (protocols)
+- **Deferred teams** — Content (fold into Web Ops), DevOps (fold into QA), Research (eng function), Community (premature)
+- **Conditions from engineering team** — Neo reviews persona designs, Matt gets explicit security cadences, Reba validates template
+
+### Team Discussion
+- All 5 engineering personas spoke on what teams THEY need
+- Neo: Web Ops, Content/Docs, Research. Killed standalone DevOps ("we're not a service")
+- Matt: Security & Compliance team, QA team. Supply chain is a real surface
+- Gary: Design/UX team, Web Ops. Wants mockups, not design decisions
+- Gabe: DevOps/Release, Community/Support. Pushed back on Neo re: ops
+- Reba: Web Ops (highest priority), Content, QA. Cadence work vs project work distinction
+- Peter synthesized: Tier 1 (Web Ops), Tier 2 (Content, QA, Security), Tier 3 (DevOps, Research, Community)
+- Unanimous approval with 3 conditions (all accepted)
+
+### Open
+- [x] ~~SPIKE: Inter-team communication protocol~~ — designed, infrastructure created, first dispatch sent
+- [x] ~~Run `/team genesis` on `_web_ops/`~~ — complete
+- [x] ~~Run `/team genesis` on `_qa/`~~ — complete
+- [x] ~~_skills-73r~~ CLOSED — Web Ops received dispatch, full end-to-end test passed
+- [ ] Delete `planning-peter/examples/` and `planning-peter/templates/` (carried from previous session)
+- [ ] Consider restructuring SKILL.md to move infrastructure instructions to MUTABLE (carried from 2026-01-25)
+
+---
+
+## Previous Session (2026-01-31)
 **Theme: Persona Resumes — base skills shipped (epic _skills-3rn CLOSED)**
 
 ### Completed
@@ -176,8 +235,12 @@ status: active
 | Site | https://hakal.github.io/team_skills/ |
 | Blog | https://hakal.github.io/team_skills/blog/ |
 | Dev.to | https://dev.to/theskillsteam |
+| Web Ops repo | `C:\Users\anyth\MINE\dev\_web_ops` |
+| QA repo | `C:\Users\anyth\MINE\dev\_qa` |
 
 ## Next Session
-- Test global TEAM.md lookup in another repo (verify Reba finds `~/.team/TEAM.md`)
+- **SPIKE: Inter-team communication** — design protocol for cross-team handoffs
+- Run genesis on `_web_ops/` and `_qa/`
+- Delete `planning-peter/examples/` and `planning-peter/templates/`
 - Consider restructuring SKILL.md to move infrastructure instructions to MUTABLE
 - Monitor Codex/Cursor adoption
