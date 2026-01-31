@@ -83,12 +83,19 @@ See [`core/genesis.md`](core/genesis.md) for the portable genesis prompt.
 
 ### Claude Code
 
+**macOS / Linux**
 ```bash
-# Quick install
-curl -sL https://raw.githubusercontent.com/anthropics/team_skills/main/install.sh | bash
+curl -sL https://raw.githubusercontent.com/HakAl/team_skills/master/install.sh | bash
+```
 
-# Or manual
-git clone https://github.com/anthropics/team_skills.git
+**Windows (PowerShell)**
+```powershell
+irm https://raw.githubusercontent.com/HakAl/team_skills/master/install.ps1 | iex
+```
+
+**Manual**
+```bash
+git clone https://github.com/HakAl/team_skills.git
 cp -r team_skills/{team,planning-peter,nifty-neo,research-reba,meticulous-matt,greenfield-gary,grizzly-gabe,zen-runner,codebase-cleanup} ~/.claude/skills/
 mkdir -p ~/.team && cp team_skills/TEAM.md ~/.team/
 ```
@@ -103,7 +110,7 @@ Or: `Peter, run genesis - the team needs its first protocols.`
 ### Codex CLI
 
 ```bash
-git clone https://github.com/anthropics/team_skills.git
+git clone https://github.com/HakAl/team_skills.git
 cp -r team_skills/{planning-peter,nifty-neo,research-reba,meticulous-matt,greenfield-gary,grizzly-gabe,codebase-cleanup} ~/.codex/skills/
 mkdir -p ~/.team && cp team_skills/TEAM.md ~/.team/
 ```
