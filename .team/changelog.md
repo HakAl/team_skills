@@ -4,6 +4,77 @@ All notable changes to team structure, processes, and skills.
 
 ---
 
+## 2026-01-31 - Persona Resumes
+
+### Added
+- **resume/ directory** in all 7 persona skills — learned domain knowledge accumulates over time
+- **Skill Acquisition Protocol** in TEAM.md — threshold-based discovery, library-first research, review gates
+- **Mandatory Memory pre/post** — personas must record tasks and check for patterns before starting work
+- **Structured recording format** — `[domain: X] [action: Y] {details} ({date})` for consistency
+- **Manifest table** in each persona SKILL.md — declarative list of learned skills, user curates
+
+### Design
+- Full spec at `.team/designs/resume-design.md`
+- Research at `.team/research/resume-spike.md` (15+ academic sources)
+- Follows [Agent Skills open standard](https://agentskills.io) — compatible with 26+ platforms
+- Peter designed → Neo critiqued (5 issues, all addressed) → User refined → Reba validated
+
+### Key Decisions
+- Threshold of 3 similar tasks before proposing a skill (Rule of Three)
+- Distinctness test over hard caps — merge overlapping skills
+- No cross-persona skill loading — context is finite
+- resume/ (learned skills) and references/ (supporting docs) are distinct
+- codebase-cleanup stays standalone — utility, not a persona capability
+- Git handles versioning — no parallel system needed
+
+---
+
+## 2026-01-29 - Cold Critic Mode
+
+### Added
+- **Cold Critic Mode** in Neo's SKILL.md (MUTABLE section)
+  - Neo spawns anonymous Task agent for adversarial plan review
+  - Counters self-preference bias (models rate own output higher)
+  - Trigger: comfort ("agreeing too easily"), not complexity threshold
+  - Neo interprets results in full context, filters false positives
+
+### Research Basis
+- Self-preference bias: arxiv 2404.13076
+- Authorship visibility increases self-voting: arxiv 2509.23537
+- Multiagent debate improves reasoning: Du et al., ICML 2024
+- Hybrid routing optimal: arxiv 2505.18286
+
+### Tested
+- Real test on Langley Request Replay plan — cold critic found 3 critical issues + 1 conceptual gap Neo missed (SSRF, circular credential exposure, lossy reconstruction, modified replay)
+
+### External
+- Blog published: https://hakal.github.io/team_skills/blog/cold-critic.html
+
+---
+
+## 2026-01-25 - Portability & Global TEAM.md
+
+### Added
+- **Global TEAM.md lookup** — skills check `.team/TEAM.md` (project) then `~/.team/TEAM.md` (global)
+- **Platform-agnostic skills** — genericized tool references in SKILL.md files
+- **Portable methodology** — `core/methodology.md` with no platform-specific references
+- **Portable genesis** — `core/genesis.md` copy-paste prompt works on any platform
+
+### Updated
+- `install.sh` — creates `~/.team/` and copies TEAM.md
+- 9 SKILL.md files — new TEAM.md lookup instruction in Team Awareness
+- README — restructured methodology-first, platform-specific install sections
+
+### Tested
+- Verified skills work on OpenAI Codex CLI
+
+### IMMUTABLE Exception (Precedent)
+- Team Awareness TEAM.md lookup is inside IMMUTABLE bounds
+- Approved: change is infrastructure (file location), not identity
+- Future: consider moving to MUTABLE where it belongs
+
+---
+
 ## 2026-01-17 - Autonomous Workflow
 
 ### Added

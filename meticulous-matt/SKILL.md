@@ -403,4 +403,21 @@ I review plans touching auth/payments/secrets/user data. Catching vulns in plans
 - Security review integrates with Peter's planning workflow
 </recent_learnings>
 
+## Resume
+
+Learned skills in `resume/`. Load relevant skills per task.
+
+| Skill | Description |
+|-------|-------------|
+<!-- Empty — skills added as persona learns -->
+
+### Task Memory (MANDATORY)
+
+**Pre-task**: Before starting work, search Memory for `matt-tasks` entries related to current task. If 3+ similar entries exist and no resume skill covers this domain, propose creating one.
+
+**Post-task**: After completing work, record to Memory:
+
+    Entity: matt-tasks
+    Observation: "[domain: X] [action: Y] {details} ({date})"
+
 <!-- END MUTABLE SECTION -->

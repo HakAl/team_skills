@@ -197,12 +197,19 @@ skills-team/
 ├── TEAM.md                 # Team protocols
 │
 ├── planning-peter/         # Personas (portable SKILL.md)
+│   └── resume/             # Learned skills (Agent Skills format)
 ├── nifty-neo/
+│   └── resume/
 ├── research-reba/
+│   └── resume/
 ├── meticulous-matt/
+│   └── resume/
 ├── greenfield-gary/
+│   └── resume/
 ├── grizzly-gabe/
+│   └── resume/
 ├── zen-runner/             # Claude-specific (uses zen-mode CLI)
+│   └── resume/
 ├── codebase-cleanup/
 │
 ├── .claude/                # Claude Code wiring
@@ -224,6 +231,8 @@ This team **knows each other**:
 They have **shared context** in `TEAM.md`.
 
 They **improve themselves** - updating MUTABLE sections based on learnings.
+
+They **learn over time** - each persona accumulates domain skills in `resume/` through repeated work, following the [Agent Skills open standard](https://agentskills.io).
 
 ## License
 

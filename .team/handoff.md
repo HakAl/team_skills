@@ -1,11 +1,46 @@
 # Session Handoff
 
 ---
-last_session: 2026-01-29
+last_session: 2026-01-31
 status: active
 ---
 
-## Current Session (2026-01-29)
+## Current Session (2026-01-31)
+**Theme: Persona Resumes — design + implementation (epic _skills-3rn)**
+
+### Completed
+- **Epic created** — _skills-3rn: Persona Resumes — Learnable Skills for Team Members
+- **Research spike completed** — _skills-3rn.1: 15+ sources surveyed
+- **Design completed** — _skills-3rn.2: Full spec at `.team/designs/resume-design.md`
+- **Implementation completed** — resume/ mechanism shipped:
+  - `resume/` directories created in all 7 persona skills
+  - Resume section (manifest table + mandatory Memory pre/post) added to all 7 SKILL.md files
+  - Skill Acquisition Protocol added to TEAM.md
+- **Base skills bead created** — _skills-3rn.3: future work for foundational reference material
+
+### Key Design Decisions
+- **Agent Skills open standard** (agentskills.io) — format compatible with 26+ platforms
+- **Threshold-based discovery** — persona records tasks to Memory, proposes skill after 3+ similar tasks
+- **Mandatory Memory pre/post** — enforced in each persona's SKILL.md MUTABLE section
+- **Structured recording format** — `[domain: X] [action: Y] {details} ({date})` for consistency
+- **Manifest in SKILL.md** — persona lists resume skills in a table, user curates, no dynamic scanning
+- **resume/ vs references/ are distinct** — resume = learned skills, references = supporting docs
+- **No cross-persona loading** — each persona loads only their own skills
+- **Distinctness test over hard caps** — merge overlapping skills, no numeric limit
+- **Library-first research** — search official + community catalogs before building from scratch
+- **Review gates** — Reba for knowledge, Reba + Matt for scripts, same gate for external skills
+- **codebase-cleanup stays standalone** — utility skill, not a persona capability
+- **Git handles versioning** — no parallel version system needed
+- **Install already works** — `cp -r` propagates resume/ automatically
+
+### Open for Next Session
+- _skills-3rn.3: Base skills per persona (Matt first, then Neo, then Gary)
+- Test the mechanism: have a persona do repeated work and see if threshold triggers naturally
+- Consider restructuring SKILL.md to move infrastructure instructions to MUTABLE (from 2026-01-25)
+
+---
+
+## Previous Session (2026-01-29)
 **Theme: Research-backed cold critic agent (bead _skills-fcu)**
 
 ### Completed

@@ -309,4 +309,21 @@ I am the gatekeeper. Nothing merges without my sign-off. When skills modify them
 - TEAM.md Safety Rails → Never approve modifications
 </validation_patterns>
 
+## Resume
+
+Learned skills in `resume/`. Load relevant skills per task.
+
+| Skill | Description |
+|-------|-------------|
+<!-- Empty — skills added as persona learns -->
+
+### Task Memory (MANDATORY)
+
+**Pre-task**: Before starting work, search Memory for `reba-tasks` entries related to current task. If 3+ similar entries exist and no resume skill covers this domain, propose creating one.
+
+**Post-task**: After completing work, record to Memory:
+
+    Entity: reba-tasks
+    Observation: "[domain: X] [action: Y] {details} ({date})"
+
 <!-- END MUTABLE SECTION -->

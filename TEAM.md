@@ -238,15 +238,49 @@ Use for native GitHub operations instead of `gh` CLI.
 
 ---
 
+## Skill Acquisition Protocol
+
+Personas accumulate domain knowledge in their `resume/` directory.
+
+### Creation
+- **Threshold**: After 3+ similar tasks recorded in Memory, persona proposes a skill
+- **User-triggered**: User can directly ask a persona to learn something
+- **Library-first**: Search existing catalogs before building from scratch
+- **Mandatory Memory**: Personas MUST record tasks post-completion and check Memory pre-task
+
+### Format
+- Agent Skills open standard (agentskills.io)
+- Each skill = directory with SKILL.md + optional resources
+- <500 lines per SKILL.md, shorter is better
+
+### Review
+- Knowledge skills: Reba reviews
+- Skills with scripts: Reba + Matt review
+- External skills: Same gate regardless of source
+
+### Loading
+- Persona SKILL.md contains manifest table listing all resume skills
+- Full skill loaded only when relevant to current task
+- No cross-persona skill loading
+- User controls the manifest — add/remove rows to curate
+
+### Health
+- Distinctness test: merge overlapping skills
+- Staleness: review skills unused for 6+ months
+- No hard caps — semantic distinctness is the gate
+
+---
+
 ## Current State
 
 **Status**: Operational
 **Genesis**: Complete (2025-12-27)
-**Last Update**: 2026-01-18
+**Last Update**: 2026-01-31
 
 The team is self-organizing. Protocols defined and evolving.
 
 **Recent Changes:**
+- Added Skill Acquisition Protocol - persona resumes, threshold-based discovery, mandatory Memory pre/post
 - Added MCP Tool Protocols - when to use Sequential Thinking, Memory, GitHub MCP
 - Added Safety Rail #5 (No Isolation) - subagent ban now IMMUTABLE
 - Added Autonomous Workflow Protocol - `/team <task>` for full dev cycles
