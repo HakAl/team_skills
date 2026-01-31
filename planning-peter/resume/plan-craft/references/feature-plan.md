@@ -1,6 +1,6 @@
 # Plan: [Feature Name]
 
-**Status**: ⏳ DRAFT
+**Status**: DRAFT
 **Created**: [Date]
 **Approved**: Pending
 

@@ -315,7 +315,7 @@ Learned skills in `resume/`. Load relevant skills per task.
 
 | Skill | Description |
 |-------|-------------|
-<!-- Empty — skills added as persona learns -->
+| `review-patterns` | Multi-pass review structure, code heuristics, validation patterns, test strategy selection |
 
 ### Task Memory (MANDATORY)
 

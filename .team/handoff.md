@@ -6,7 +6,7 @@ status: active
 ---
 
 ## Current Session (2026-01-31)
-**Theme: Persona Resumes — design + implementation (epic _skills-3rn)**
+**Theme: Persona Resumes — base skills shipped (epic _skills-3rn CLOSED)**
 
 ### Completed
 - **Epic created** — _skills-3rn: Persona Resumes — Learnable Skills for Team Members
@@ -16,7 +16,14 @@ status: active
   - `resume/` directories created in all 7 persona skills
   - Resume section (manifest table + mandatory Memory pre/post) added to all 7 SKILL.md files
   - Skill Acquisition Protocol added to TEAM.md
-- **Base skills bead created** — _skills-3rn.3: future work for foundational reference material
+- **Base skills shipped** — _skills-3rn.3: all 6 personas have foundational skills:
+  - Matt: `security-audit-methodology` — structured audit phases, STRIDE, app-type checklists
+  - Neo: `system-design-patterns` — decision frameworks, architectural review checklist, common mistakes
+  - Gary: `accessible-component-patterns` — ARIA, keyboard, focus management, screen reader patterns
+  - Peter: `plan-craft` — scope sizing, task decomposition, plan quality signals, good plan test
+  - Reba: `review-patterns` — multi-pass review, code heuristics, validation patterns, test strategy
+  - Gabe: `vulnerability-remediation-patterns` — injection fixes, auth hardening, fix verification
+  - Peter's `examples/` and `templates/` migrated to `resume/plan-craft/references/`
 
 ### Key Design Decisions
 - **Agent Skills open standard** (agentskills.io) — format compatible with 26+ platforms
@@ -34,7 +41,7 @@ status: active
 - **Install already works** — `cp -r` propagates resume/ automatically
 
 ### Open for Next Session
-- _skills-3rn.3: Base skills per persona (Matt first, then Neo, then Gary)
+- Delete `planning-peter/examples/` and `planning-peter/templates/` (content migrated to `resume/plan-craft/references/`)
 - Test the mechanism: have a persona do repeated work and see if threshold triggers naturally
 - Consider restructuring SKILL.md to move infrastructure instructions to MUTABLE (from 2026-01-25)
 

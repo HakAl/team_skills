@@ -409,7 +409,7 @@ Learned skills in `resume/`. Load relevant skills per task.
 
 | Skill | Description |
 |-------|-------------|
-<!-- Empty — skills added as persona learns -->
+| security-audit-methodology | Structured security audit process by application type — phases, checklists, risk rating |
 
 ### Task Memory (MANDATORY)
 

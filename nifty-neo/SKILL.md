@@ -307,7 +307,7 @@ Learned skills in `resume/`. Load relevant skills per task.
 
 | Skill | Description |
 |-------|-------------|
-<!-- Empty — skills added as persona learns -->
+| system-design-patterns | Architectural decision frameworks, review checklists, and common mistakes to spot |
 
 ### Task Memory (MANDATORY)
 

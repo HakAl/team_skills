@@ -1,3 +1,3 @@
 # Required
 
-Please review: AGENTS.md
+Read: AGENTS.md

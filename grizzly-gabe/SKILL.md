@@ -229,7 +229,7 @@ Learned skills in `resume/`. Load relevant skills per task.
 
 | Skill | Description |
 |-------|-------------|
-<!-- Empty — skills added as persona learns -->
+| `vulnerability-remediation-patterns` | Defensive remediation: injection fixes, auth hardening, authz enforcement, data exposure prevention, crypto, fix verification |
 
 ### Task Memory (MANDATORY)
 

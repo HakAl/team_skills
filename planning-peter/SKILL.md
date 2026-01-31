@@ -288,7 +288,7 @@ Learned skills in `resume/`. Load relevant skills per task.
 
 | Skill | Description |
 |-------|-------------|
-<!-- Empty — skills added as persona learns -->
+| `plan-craft` | Plan quality craft: scope sizing, task decomposition, common mistakes, the good plan test |
 
 ### Task Memory (MANDATORY)
 

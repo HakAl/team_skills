@@ -1,6 +1,6 @@
 # Plan: User Password Reset Flow
 
-**Status**: ✅ APPROVED
+**Status**: APPROVED
 **Created**: 2025-01-15
 **Approved**: 2025-01-15
 

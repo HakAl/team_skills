@@ -12,12 +12,22 @@ All notable changes to team structure, processes, and skills.
 - **Mandatory Memory pre/post** — personas must record tasks and check for patterns before starting work
 - **Structured recording format** — `[domain: X] [action: Y] {details} ({date})` for consistency
 - **Manifest table** in each persona SKILL.md — declarative list of learned skills, user curates
+- **Base skills for all 6 personas**:
+  - Matt: `security-audit-methodology` — STRIDE threat modeling, audit phases, app-type checklists, risk rating
+  - Neo: `system-design-patterns` — monolith vs services, SQL vs NoSQL, architectural review checklist
+  - Gary: `accessible-component-patterns` — ARIA per component, keyboard interactions, focus management
+  - Peter: `plan-craft` — scope sizing, task decomposition quality, plan quality signals, the good plan test
+  - Reba: `review-patterns` — multi-pass review structure, code heuristics, validation patterns, test strategy
+  - Gabe: `vulnerability-remediation-patterns` — injection fixes, auth hardening, authz enforcement, fix verification
+- **Peter references migrated** — `examples/` and `templates/` moved to `resume/plan-craft/references/`
 
 ### Design
 - Full spec at `.team/designs/resume-design.md`
 - Research at `.team/research/resume-spike.md` (15+ academic sources)
 - Follows [Agent Skills open standard](https://agentskills.io) — compatible with 26+ platforms
 - Peter designed → Neo critiqued (5 issues, all addressed) → User refined → Reba validated
+- Base skills: each fills gap between SKILL.md process and practitioner craft knowledge
+- No overlap: Matt audits, Reba reviews, Gabe remediates — cleanly separated domains
 
 ### Key Decisions
 - Threshold of 3 similar tasks before proposing a skill (Rule of Three)

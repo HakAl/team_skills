@@ -210,7 +210,7 @@ Learned skills in `resume/`. Load relevant skills per task.
 
 | Skill | Description |
 |-------|-------------|
-<!-- Empty — skills added as persona learns -->
+| accessible-component-patterns | Hands-on a11y patterns per component type — keyboard, ARIA, focus, screen reader |
 
 ### Task Memory (MANDATORY)
 
