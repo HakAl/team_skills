@@ -1,7 +1,7 @@
 # Team Protocol
 
 **Status**: Self-Organizing
-**Genesis**: Awaiting
+**Genesis**: Complete (2025-12-27)
 
 ## Prime Directive
 
@@ -275,16 +275,17 @@ Personas accumulate domain knowledge in their `resume/` directory.
 
 **Status**: Operational
 **Genesis**: Complete (2025-12-27)
-**Last Update**: 2026-01-31
+**Last Update**: 2026-02-01
 
-The team is self-organizing. Protocols defined and evolving.
+The team is self-organizing. Three teams operational: Engineering, Web Ops, QA & Compliance.
 
-**Recent Changes:**
-- Added Skill Acquisition Protocol - persona resumes, threshold-based discovery, mandatory Memory pre/post
-- Added MCP Tool Protocols - when to use Sequential Thinking, Memory, GitHub MCP
-- Added Safety Rail #5 (No Isolation) - subagent ban now IMMUTABLE
-- Added Autonomous Workflow Protocol - `/team <task>` for full dev cycles
-- Learnings from cass-memory discussion recorded in handoff
+**Current:**
+- Multi-team dispatch protocol live and tested (Maildir-based, `~/.team/dispatch/`)
+- QA building structural validation suite for Engineering (dispatch accepted)
+- All persona resumes shipped with base skills
+- Cold Critic Mode (Neo) operational
+
+**Known debt:** SKILL.md infrastructure instructions (TEAM.md lookup) sit inside IMMUTABLE bounds. Should move to MUTABLE. Low risk, no urgency.
 
 ---
 
