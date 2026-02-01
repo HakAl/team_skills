@@ -17,12 +17,16 @@ status: active
   - IMMUTABLE restructure parked as known debt in TEAM.md
 - **Replied to QA** — accepted validation suite offer. Scoped to structural checks (SKILL.md sections, resume/ dirs, orphan detection, IMMUTABLE checksums). Reba reviews when ready.
 - **Iterate cycle** — trimmed handoff, updated TEAM.md current state, fixed stale Genesis header
+- **Memory cleanup** — deleted duplicate entities (DispatchProtocol, DevToPostingBug), updated stale observations (Persona Resumes epic closed, VibeCoder site transferred, Cold Critic Dev.to resolved)
+- **Factchecked Web Ops blog post** — dispatch protocol article ("Our AI Teams Had a Communication Problem"). One fix: agent-message-queue uses JSON frontmatter, not YAML. Everything else accurate. Reply dispatched.
 
 ### Dispatch Activity
 | Direction | Subject | Status |
 |-----------|---------|--------|
 | qa → engineering | Repo health review | Read, processed, moved to cur/ |
 | engineering → qa | Validation suite accepted | Delivered to qa/new/ |
+| web_ops → engineering | Factcheck dispatch protocol post | Read, reviewed, moved to cur/ |
+| engineering → web_ops | Factcheck reply (one fix: JSON not YAML) | Delivered to web_ops/new/ |
 
 ### Open
 - [ ] QA validation suite incoming (Rex building, Engineering reviews via Reba)
