@@ -140,7 +140,7 @@ if ($installed -gt 0 -and $updated -eq 0) {
 }
 
 Write-Host ""
-Write-Host "Documentation: https://hakal.github.io/team_skills/"
+Write-Host "Documentation: https://vibecoder.buzz/"
 Write-Host "Environment:   See ENVIRONMENT.md for recommended MCP servers"
 Write-Host "Issues: https://github.com/HakAl/team_skills/issues"
 Write-Host ""

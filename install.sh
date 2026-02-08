@@ -130,7 +130,7 @@ elif [ $updated -gt 0 ]; then
 fi
 
 echo ""
-echo "Documentation: https://hakal.github.io/team_skills/"
+echo "Documentation: https://vibecoder.buzz/"
 echo "Environment:   See ENVIRONMENT.md for recommended MCP servers"
 echo "Issues: https://github.com/HakAl/team_skills/issues"
 echo ""

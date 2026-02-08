@@ -58,7 +58,7 @@ All notable changes to team structure, processes, and skills.
 - Real test on Langley Request Replay plan — cold critic found 3 critical issues + 1 conceptual gap Neo missed (SSRF, circular credential exposure, lossy reconstruction, modified replay)
 
 ### External
-- Blog published: https://hakal.github.io/team_skills/blog/cold-critic.html
+- Blog published: https://vibecoder.buzz/blog/cold-critic.html
 
 ---
 
@@ -134,7 +134,7 @@ All notable changes to team structure, processes, and skills.
 ## 2025-12-28 - Team Goes Public
 
 ### Shipped
-- **GitHub Pages Site** ([hakal.github.io/team_skills](https://hakal.github.io/team_skills/))
+- **GitHub Pages Site** ([vibecoder.buzz](https://vibecoder.buzz/))
   - Team roster, philosophy, get started guide
   - Static HTML/CSS, no build step, no JavaScript
   - Accessible: semantic HTML, reduced-motion, high-contrast support

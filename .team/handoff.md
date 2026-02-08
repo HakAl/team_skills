@@ -33,8 +33,8 @@ status: active
 |-------|----------|
 | Portable methodology | core/methodology.md |
 | Portable genesis | core/genesis.md |
-| Site | https://hakal.github.io/team_skills/ |
-| Blog | https://hakal.github.io/team_skills/blog/ |
+| Site | https://vibecoder.buzz/ |
+| Blog | https://vibecoder.buzz/blog/ |
 | Dev.to | https://dev.to/theskillsteam |
 | Web Ops repo | `C:\Users\anyth\MINE\dev\_web_ops` |
 | QA repo | `C:\Users\anyth\MINE\dev\_qa` |
