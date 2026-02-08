@@ -140,7 +140,7 @@ status: [active|shipped|blocked]
 ### Invocation
 
 ```
-/team <task>          # e.g., /team bd-42, /team "add dark mode toggle"
+/team <task>          # e.g., /team br-42, /team "add dark mode toggle"
 /team task.md         # Read task from file
 ```
 
@@ -275,7 +275,7 @@ Personas accumulate domain knowledge in their `resume/` directory.
 
 **Status**: Operational
 **Genesis**: Complete (2025-12-27)
-**Last Update**: 2026-02-01
+**Last Update**: 2026-02-08
 
 The team is self-organizing. Three teams operational: Engineering, Web Ops, QA & Compliance.
 
@@ -285,7 +285,7 @@ The team is self-organizing. Three teams operational: Engineering, Web Ops, QA &
 - All persona resumes shipped with base skills
 - Cold Critic Mode (Neo) operational
 
-**Known debt:** SKILL.md infrastructure instructions (TEAM.md lookup) sit inside IMMUTABLE bounds. Should move to MUTABLE. Low risk, no urgency.
+**Resolved debt:** SKILL.md infrastructure instructions (Team Awareness, Invocation) moved from IMMUTABLE to MUTABLE across all 8 skills (2026-02-08). IMMUTABLE now contains only Persona, Core Directives, Safety.
 
 ---
 

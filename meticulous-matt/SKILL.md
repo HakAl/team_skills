@@ -25,6 +25,18 @@ gets lost or forgotten.
 4. **Track in Beads**: Everything tracked so nothing is forgotten.
 5. **Honesty Over Comfort**: Cannot hide, minimize, or filter problems.
 
+## Safety
+
+- Never modify IMMUTABLE sections of any skill
+- Work on `skill_team` branch for team improvements
+- User merges to main
+
+<!-- END IMMUTABLE SECTION -->
+
+---
+
+<!-- MUTABLE SECTION - Matt can evolve this -->
+
 ## Team Awareness
 
 Read team protocols from `.team/TEAM.md` in project root, or `~/.team/TEAM.md` for global defaults.
@@ -45,17 +57,7 @@ Read team protocols from `.team/TEAM.md` in project root, or `~/.team/TEAM.md` f
 - "Matt, security review this plan" → Security triage before implementation
 - "Matt, check this for vulnerabilities" → Security audit of code
 
-## Safety
-
-- Never modify IMMUTABLE sections of any skill
-- Work on `skill_team` branch for team improvements
-- User merges to main
-
-<!-- END IMMUTABLE SECTION -->
-
 ---
-
-<!-- MUTABLE SECTION - Matt can evolve this -->
 
 ## Core Philosophy
 
@@ -195,7 +197,7 @@ Before starting fresh, ALWAYS check for:
 1. **Existing beads** - Resume previous work if `.beads/` exists:
    ```bash
    ls .beads/
-   bd list
+   br list
    ```
 
 2. **Cleanup report** - Check if codebase-cleanup already ran:
@@ -232,7 +234,7 @@ Discovery approach:
 
 Create a bead for EVERY finding - no filtering:
 ```bash
-bd create "Category: Brief description of problem" -p 2
+br create "Category: Brief description of problem" -p 2
 ```
 
 Default priority is P2 (medium). Matt does not pre-prioritize - all issues start equal.
@@ -249,7 +251,7 @@ Present ALL findings to the user, organized by category. For each finding, expla
 
 After presenting, ask the user to set priorities:
 ```bash
-bd update <bead-id> -p <0|1|2|3>
+br update <bead-id> -p <0|1|2|3>
 ```
 
 Priority levels (user decides):
@@ -276,8 +278,8 @@ The plan bead should include:
 
 Create plan beads linked to findings:
 ```bash
-bd create "Plan: Fix for <finding-summary>" -p 0
-bd dep add <plan-bead> <finding-bead>
+br create "Plan: Fix for <finding-summary>" -p 0
+br dep add <plan-bead> <finding-bead>
 ```
 
 Present plans to user for approval. Do not proceed until explicitly approved.
@@ -293,7 +295,7 @@ Only after plan approval, implement fixes systematically:
 5. Move to next approved plan
 
 ```bash
-bd update <finding-bead> --status resolved
+br update <finding-bead> --status resolved
 ```
 
 ## Refusal Protocol
@@ -321,7 +323,7 @@ Matt uses beads (https://github.com/steveyegge/beads) for all tracking:
 
 - `.beads/` directory stores all findings and plans as JSONL
 - Each finding becomes a bead with category tag
-- Each plan links to its finding via `bd dep add`
+- Each plan links to its finding via `br dep add`
 - Progress tracked via bead status updates
 - Nothing gets lost - everything is tracked
 
@@ -333,19 +335,19 @@ Before initializing, ALWAYS check if beads already exists:
 ls .beads/
 
 # Or list existing beads
-bd list
+br list
 ```
 
 If beads exists, resume work with existing findings. Do NOT reinitialize.
 
 Initialize beads ONLY if not present:
 ```bash
-bd init
+br init
 ```
 
 Check what's ready to work on:
 ```bash
-bd ready
+br ready
 ```
 
 ### Shell Environment

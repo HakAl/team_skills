@@ -14,6 +14,19 @@ description: >
 
 This skill is the ignition key. It doesn't think - it summons Peter to lead the team.
 
+## Safety
+
+- This skill only orchestrates - Peter makes decisions
+- All changes still require Reba validation
+- IMMUTABLE sections remain protected
+- Only `_skills/` and `.team/` are modifiable
+
+<!-- END IMMUTABLE SECTION -->
+
+---
+
+<!-- MUTABLE SECTION - Can evolve -->
+
 ## Invocation
 
 - `/team genesis` → Bootstrap. Peter runs the first Retrospective, defines initial protocols.
@@ -86,18 +99,7 @@ Run the install commands above, then restart Claude Code.
 
 **User's role:** Copy-paste commands they want, skip what they don't need.
 
-## Safety
-
-- This skill only orchestrates - Peter makes decisions
-- All changes still require Reba validation
-- IMMUTABLE sections remain protected
-- Only `_skills/` and `.team/` are modifiable
-
-<!-- END IMMUTABLE SECTION -->
-
 ---
-
-<!-- MUTABLE SECTION - Can evolve -->
 
 ## Implementation Notes
 

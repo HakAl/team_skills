@@ -1,35 +1,32 @@
 # Session Handoff
 
 ---
-last_session: 2026-02-01
+last_session: 2026-02-08
 status: active
 ---
 
-## Current Session (2026-02-01)
-**Theme: Housekeeping — dispatch processed, iterate cycle**
+## Current Session (2026-02-08)
+**Theme: Inbox triage + IMMUTABLE debt resolved**
 
 ### Completed
-- **Restored demo GIF** — `docs/demo.gif` lost in site ownership transfer (commit 424446d), recovered from git history
-- **Processed QA dispatch** — repo health review, grade A-. Three findings: `nul` file, stale dirs, IMMUTABLE debt
-- **Housekeeping resolved**:
-  - `nul` added to `.gitignore` (Windows artifact)
-  - `planning-peter/examples/` and `templates/` confirmed already deleted
-  - IMMUTABLE restructure parked as known debt in TEAM.md
-- **Replied to QA** — accepted validation suite offer. Scoped to structural checks (SKILL.md sections, resume/ dirs, orphan detection, IMMUTABLE checksums). Reba reviews when ready.
-- **Iterate cycle** — trimmed handoff, updated TEAM.md current state, fixed stale Genesis header
-- **Memory cleanup** — deleted duplicate entities (DispatchProtocol, DevToPostingBug), updated stale observations (Persona Resumes epic closed, VibeCoder site transferred, Cold Critic Dev.to resolved)
-- **Factchecked Web Ops blog post** — dispatch protocol article ("Our AI Teams Had a Communication Problem"). One fix: agent-message-queue uses JSON frontmatter, not YAML. Everything else accurate. Reply dispatched.
+- **Triaged Engineering inbox** — 3 pending dispatches reviewed and processed
+- **Langley UX dispatches filed** — body viewer (langley-4z1m) and tool drilldown (langley-hneg) UX specs from Dana moved to `cur/`. Langley project work, no Engineering action needed now.
+- **QA validation suite reviewed by Reba** — script approved (clean bash, read-only, correct checksums). 4 reported failures are all false positives: `codebase-cleanup` and `team` are utility/orchestration skills, not personas.
+- **IMMUTABLE debt resolved** — moved Team Awareness and Invocation sections from IMMUTABLE to MUTABLE across all 8 SKILL.md files. IMMUTABLE now contains only Persona, Core Directives, Safety. Reba approved. Neo confirmed architectural correctness.
+- **QA notified of baseline regen** — dispatched notice that all 8 checksums drifted (expected, authorized). QA needs to run `--update-baseline`.
 
 ### Dispatch Activity
 | Direction | Subject | Status |
 |-----------|---------|--------|
-| qa → engineering | Repo health review | Read, processed, moved to cur/ |
-| engineering → qa | Validation suite accepted | Delivered to qa/new/ |
-| web_ops → engineering | Factcheck dispatch protocol post | Read, reviewed, moved to cur/ |
-| engineering → web_ops | Factcheck reply (one fix: JSON not YAML) | Delivered to web_ops/new/ |
+| qa → engineering | Validation suite delivery | Reviewed, approved with feedback, moved to cur/ |
+| engineering → qa | Review reply (add UTILITY_SKILLS list) | Delivered to qa/new/ |
+| engineering → qa | Baseline regen needed (IMMUTABLE restructure) | Delivered to qa/new/ |
+| web_ops → engineering | Body viewer UX (langley-4z1m) | Filed, moved to cur/ |
+| web_ops → engineering | Tool drilldown UX (langley-hneg) | Filed, moved to cur/ |
 
 ### Open
-- [ ] QA validation suite incoming (Rex building, Engineering reviews via Reba)
+- [ ] QA updating validation script with UTILITY_SKILLS exclusion (awaiting reply)
+- [ ] QA regenerating checksum baseline after IMMUTABLE restructure (awaiting confirmation)
 
 ## Assets
 | Asset | Location |
