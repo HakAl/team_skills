@@ -1,43 +1,42 @@
 # Session Handoff
 
 ---
-last_session: 2026-02-08
+last_session: 2026-02-15
 status: active
 ---
 
-## Current Session (2026-02-08)
-**Theme: Inbox triage, debt paydown, housekeeping**
+## Summary
+- Complete rewrite of `collaborate/SKILL.md` informed by published research on multi-agent debate and LLM evaluation
+- E2E test: 5/5 providers returned (Groq 1.7s, Cerebras 2.0s, GitHub Models 4.9s, SambaNova 6.6s, Codex ~5min)
+- Reviewed parapet `tuning.md` — 7 deduplicated findings, 4 corroborated across providers
+- Codex caught a build-breaking bug: `adversarial_suffix` regex uses backreferences unsupported by Rust's regex crate
+- Shell escaping solved: Write tool creates temp JSON, `curl -d @file && rm file` — no more sed/awk breakage
+- Prior session: delegation research landed, team startup slimmed, model IDs fixed
 
-### Completed
-- **Triaged Engineering inbox** — 3 pending dispatches reviewed and processed
-- **Langley UX dispatches filed** — body viewer (langley-4z1m) and tool drilldown (langley-hneg) UX specs from Dana moved to `cur/`. Langley project work, no Engineering action needed now.
-- **QA validation suite reviewed by Reba** — script approved (clean bash, read-only, correct checksums). 4 reported failures are all false positives: `codebase-cleanup` and `team` are utility/orchestration skills, not personas.
-- **IMMUTABLE debt resolved** — moved Team Awareness and Invocation sections from IMMUTABLE to MUTABLE across all 8 SKILL.md files. IMMUTABLE now contains only Persona, Core Directives, Safety. Reba approved. Neo confirmed.
-- **Renamed bd → br** — updated all beads CLI references in AGENTS.md, TEAM.md, meticulous-matt/SKILL.md, .gitattributes
-- **Site URL updated to vibecoder.buzz** — replaced all `hakal.github.io` references across docs/ redirects, install scripts, handoff, changelog (9 files)
-- **QA notified of baseline regen** — dispatched notice that all 8 checksums drifted (expected, authorized)
+## Decisions Made
+- Each provider gets a different review lens (not just different model): Coherence, Assumptions, Completeness, Reasoning, Ground Truth
+- Research basis: heterogeneous models +9% accuracy (GSM-8K), role-specific lenses +4-6% accuracy with 30% fewer factual errors (A-HMAD), independent review > iterative debate
+- No auto-integration of findings — user triages. No auto-dismissal of Medium/Low
+- Moderate framing ("thorough review through your lens") over adversarial ("attack this plan") per EMNLP 2024
+- Structured output format: FINDING/SECTION/EVIDENCE/SEVERITY/FIX with NO_FINDINGS escape
+- Triage rubric: 4 dimensions (Corroboration, Grounding, Actionability, Novelty)
+- Temp JSON files allowed in Safety section (minimal file creation, deleted after use)
+- Gemini made optional — free tier quota unreliable
 
-### Dispatch Activity
-| Direction | Subject | Status |
-|-----------|---------|--------|
-| qa → engineering | Validation suite delivery | Reviewed, approved with feedback, moved to cur/ |
-| engineering → qa | Review reply (add UTILITY_SKILLS list) | Delivered to qa/new/ |
-| engineering → qa | Baseline regen needed (IMMUTABLE restructure) | Delivered to qa/new/ |
-| web_ops → engineering | Body viewer UX (langley-4z1m) | Filed, moved to cur/ |
-| web_ops → engineering | Tool drilldown UX (langley-hneg) | Filed, moved to cur/ |
+## Open Threads
+- [ ] QA validation suite: needs UTILITY_SKILLS exclusion list + baseline regen
+- [x] Collaborate skill: 5/5 providers verified, full E2E test passed
+- [ ] Reliability tally: structure defined in TEAM.md — needs initial baseline data
+- [ ] Web Ops blog post about cross-model review results planned
 
-### Commits
-- `2e4bb4c` — Shrink IMMUTABLE sections, rename bd to br
-- `c3551de` — Update site URLs to vibecoder.buzz
-
-### Open
-- [ ] QA updating validation script with UTILITY_SKILLS exclusion (awaiting reply)
-- [ ] QA regenerating checksum baseline after IMMUTABLE restructure (awaiting confirmation)
-- [ ] Pre-commit hook still references `bd` — should update to `br`
+## Next Session
+Start tracking reliability tally. Web Ops writing blog about collaborate results.
 
 ## Assets
 | Asset | Location |
 |-------|----------|
+| Delegation research | .team/research/delegation.md |
+| Collaborate skill | collaborate/SKILL.md |
 | Portable methodology | core/methodology.md |
 | Portable genesis | core/genesis.md |
 | Site | https://vibecoder.buzz/ |
@@ -45,3 +44,5 @@ status: active
 | Dev.to | https://dev.to/theskillsteam |
 | Web Ops repo | `C:\Users\anyth\MINE\dev\_web_ops` |
 | QA repo | `C:\Users\anyth\MINE\dev\_qa` |
+| Parapet | `C:\Users\anyth\MINE\dev\parapet` |
+| Parapet paper | https://arxiv.org/abs/2602.11247 |

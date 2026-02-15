@@ -78,6 +78,7 @@ Learnings about Claude Code platform behavior:
 
 | Trigger | Action |
 |---------|--------|
+| Build complete | Gary demos what it does + proof it works |
 | Code complete | "Reba, review this" |
 | Security-sensitive (user input, auth, permissions, file access) | "Matt, security check" → then Reba |
 | Architecture questions during review | Reba pulls in Neo |
@@ -91,6 +92,79 @@ Learnings about Claude Code platform behavior:
 - Credential handling
 
 When in doubt, ask Matt.
+
+---
+
+## Delegation Quality
+
+Concepts from organizational theory applied to agent delegation (source: `.team/research/delegation.md`).
+
+### Task Direction Taxonomy
+
+Every handoff has a direction. The verification question changes based on who's on each end.
+
+| Direction | When It Happens | Verification Question | Failure Mode |
+|-----------|----------------|----------------------|--------------|
+| **Human→AI** | User tells Peter what to build | "Did it do what I meant?" | Specification gaming — building what was said, not what was meant |
+| **AI→AI** | Peter→Neo→Gary→Reba pipeline | "Did it meet spec?" | Intent drift — each hop adds interpretation, goal is 3 translations removed by build time |
+| **AI→Human** | Checkpoints, escape conditions, review requests | "Was this respectful of the user's time?" | Dumping unfinished thinking on the user, asking them to do your reasoning |
+
+**Apply at every handoff.** Before passing work to the next person, ask the verification question for that direction.
+
+### Zone of Indifference
+
+Intent drifts through delegation chains. Each hop adds interpretation. By the time work reaches the builder, the user's actual goal may be unrecognizable.
+
+**Mitigation:** Verify the reasoning chain, not just the artifact.
+- Reba reviews not just "does the code work" but "does this address what the user actually asked for?"
+- At each handoff, the receiver states back what they understand the goal to be
+- If the stated goal has drifted from the user's words, stop and realign
+
+### Adaptive Re-delegation
+
+Plans must include per-step abort criteria, not just workflow-level escape hatches.
+
+**Format:** Each task in a plan includes an "Abort if" line:
+```
+### Task 3: Build the caching layer
+Abort if: Cache invalidation strategy is ambiguous after 10 min exploration
+Abort if: Existing code already has a caching mechanism we missed in discovery
+```
+
+If an abort condition fires, the builder stops and escalates — doesn't push through.
+
+### Asymmetric Monitoring
+
+Scale oversight to stakes. Not everything needs the same review intensity.
+
+| Stakes | Monitoring Level | Example |
+|--------|-----------------|---------|
+| **Low** | Output-only check | Formatting changes, docs, comments |
+| **Medium** | Standard review (Reba) | New features, refactors |
+| **High** | Deep review (Reba + Matt or Neo) | Security, architecture, user-facing contracts |
+| **Critical** | Cross-model review (`/collaborate`) | Architectural decisions, high-blast-radius changes |
+
+Prevents alarm fatigue. Not every PR needs Matt.
+
+### Reliability Tally
+
+Track clean completions vs. rework per persona. Not for gating — for self-awareness.
+
+**Format** (in `.team/reliability.md` — persistent across sessions):
+```
+## Reliability
+| Persona | Clean | Rework | Notes |
+|---------|-------|--------|-------|
+| Peter   | 5     | 1      | Rework: underspecified plan for dispatch protocol |
+| Gary    | 4     | 2      | Rework: missed edge case in CLI parser, CSS regression |
+| Neo     | 3     | 0      | — |
+```
+
+**Rules:**
+- Updated after each task completion
+- "Rework" = Reba sent it back, or user flagged a miss
+- Consistent rework on same category → update the persona's skills, not add more review
+- Lightweight — a tally, not a database
 
 ---
 
@@ -158,11 +232,13 @@ status: [active|shipped|blocked]
 
 ### Principles
 
-1. **Team figures out handoffs** - No rigid script. Peter hands off when ready, not on a timer.
-2. **Escape hatch** - If stuck or ambiguous, ask the user. Autonomous ≠ reckless.
-3. **Personas stay in context** - All discussion happens in the same response flow. No Task subagents for team members.
-4. **Matt/Gabe as needed** - Security-sensitive? Pull Matt. Something broke? Pull Gabe.
-5. **Output = Deliverable + Summary** - User sees what was built AND how the team got there.
+1. **Decompose until verifiable** - Break tasks until each subtask has a checkable output. If you can't verify it, you haven't decomposed far enough.
+2. **Explicit bail triggers** - Plans include per-step "abort if" conditions, not just workflow-level escape hatches.
+3. **Team figures out handoffs** - No rigid script. Peter hands off when ready, not on a timer.
+4. **Escape hatch** - If stuck or ambiguous, ask the user. Autonomous ≠ reckless.
+5. **Personas stay in context** - All discussion happens in the same response flow. No Task subagents for team members.
+6. **Matt/Gabe as needed** - Security-sensitive? Pull Matt. Something broke? Pull Gabe.
+7. **Output = Deliverable + Summary** - User sees what was built AND how the team got there.
 
 ### When to Use
 
@@ -275,17 +351,18 @@ Personas accumulate domain knowledge in their `resume/` directory.
 
 **Status**: Operational
 **Genesis**: Complete (2025-12-27)
-**Last Update**: 2026-02-08
+**Last Update**: 2026-02-14
 
 The team is self-organizing. Three teams operational: Engineering, Web Ops, QA & Compliance.
 
 **Current:**
-- Multi-team dispatch protocol live and tested (Maildir-based, `~/.team/dispatch/`)
-- QA building structural validation suite for Engineering (dispatch accepted)
-- All persona resumes shipped with base skills
+- Delegation quality protocols landed (task direction taxonomy, zone of indifference, adaptive re-delegation, asymmetric monitoring, reliability tally)
+- Collaborate skill operational — 5/5 providers verified, research-informed lenses, E2E tested against parapet tuning plan
+- Team startup slimmed — cross-team inbox scan removed, leads check their own inbox
+- Multi-team dispatch protocol live (Maildir-based, `~/.team/dispatch/`)
 - Cold Critic Mode (Neo) operational
 
-**Resolved debt:** SKILL.md infrastructure instructions (Team Awareness, Invocation) moved from IMMUTABLE to MUTABLE across all 8 skills (2026-02-08). IMMUTABLE now contains only Persona, Core Directives, Safety.
+**Resolved debt:** SKILL.md infrastructure instructions moved IMMUTABLE→MUTABLE (2026-02-08). Cross-team inbox scan removed from startup (2026-02-14).
 
 ---
 
