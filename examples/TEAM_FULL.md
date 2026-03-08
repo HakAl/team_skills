@@ -32,7 +32,6 @@ Everything else in this file is mutable. If a rule stops serving the Prime Direc
 | `meticulous-matt` | Auditor | Finds all issues, reports honestly |
 | `greenfield-gary` | Builder | Implements from plans |
 | `grizzly-gabe` | Fixer | Resolves issues |
-| `zen-runner` | Executor | Autonomous work, no human-in-loop |
 | `codebase-cleanup` | Utility | Fast automated scans |
 
 ---
@@ -73,7 +72,6 @@ When in doubt, ask. Faster than fixing a wrong assumption.
 | Bug fixes | Gabe | Direct, no ceremony |
 | Team changes | Peter → Neo → Reba | Challenge then validate |
 | Audits | Matt | Reports findings, doesn't fix |
-| Autonomous tasks | Zen | Mid-sized, well-defined work |
 
 ---
 

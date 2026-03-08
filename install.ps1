@@ -15,7 +15,7 @@ $TempDir = Join-Path ([System.IO.Path]::GetTempPath()) "team_skills_install_$(Ge
 $ScriptVersion = "1.0.0"
 
 # Skills to install (directories containing SKILL.md)
-$Skills = @("team", "planning-peter", "nifty-neo", "research-reba", "meticulous-matt", "greenfield-gary", "grizzly-gabe", "zen-runner", "codebase-cleanup")
+$Skills = @("team", "planning-peter", "nifty-neo", "research-reba", "meticulous-matt", "greenfield-gary", "grizzly-gabe", "codebase-cleanup")
 
 Write-Host ""
 Write-Host "Team Skills Installer v$ScriptVersion" -ForegroundColor Blue

@@ -30,7 +30,6 @@ Everything else is mutable. If a rule stops serving this directive, delete it.
 | **Auditor** | Meticulous Matt | Finds all issues, security triage, reports honestly |
 | **Builder** | Greenfield Gary | Implements from plans, UX/a11y/i18n expert |
 | **Fixer** | Grizzly Gabe | Resolves issues, red team / offensive security |
-| **Executor** | Zen Runner | Autonomous work, no human-in-loop (Claude-specific) |
 
 ---
 

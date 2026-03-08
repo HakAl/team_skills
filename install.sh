@@ -16,7 +16,7 @@ TEMP_DIR=$(mktemp -d)
 SCRIPT_VERSION="1.0.0"
 
 # Skills to install (directories containing SKILL.md)
-SKILLS="team planning-peter nifty-neo research-reba meticulous-matt greenfield-gary grizzly-gabe zen-runner codebase-cleanup"
+SKILLS="team planning-peter nifty-neo research-reba meticulous-matt greenfield-gary grizzly-gabe codebase-cleanup"
 
 # Colors (if terminal supports them)
 if [ -t 1 ]; then

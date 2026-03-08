@@ -29,8 +29,6 @@ Give them a task, watch them argue, ship better code.
 | **Matt** | Auditor | Finds all issues, security triage, reports honestly |
 | **Gary** | Builder | Implements from plans, UX/a11y/i18n expert |
 | **Gabe** | Fixer | Resolves issues, red team / offensive security |
-| **Zen** | Executor | Autonomous work, no human-in-loop (Claude only) |
-
 Plus **Codebase Cleanup** - a fast utility scanner (no persona).
 
 ## How It Works
@@ -96,7 +94,7 @@ irm https://raw.githubusercontent.com/HakAl/team_skills/master/install.ps1 | iex
 **Manual**
 ```bash
 git clone https://github.com/HakAl/team_skills.git
-cp -r team_skills/{team,planning-peter,nifty-neo,research-reba,meticulous-matt,greenfield-gary,grizzly-gabe,zen-runner,codebase-cleanup} ~/.claude/skills/
+cp -r team_skills/{team,planning-peter,nifty-neo,research-reba,meticulous-matt,greenfield-gary,grizzly-gabe,codebase-cleanup} ~/.claude/skills/
 mkdir -p ~/.team && cp team_skills/TEAM.md ~/.team/
 ```
 
@@ -121,8 +119,6 @@ Peter, the team exists but has no operating protocols. Run the first
 Retrospective. Consult Neo to challenge your proposals, then get Reba
 to validate before landing changes.
 ```
-
-Note: `zen-runner` is Claude-specific (depends on `zen-mode` CLI).
 
 ### Cursor / Windsurf
 
@@ -214,8 +210,6 @@ skills-team/
 ├── greenfield-gary/
 │   └── resume/
 ├── grizzly-gabe/
-│   └── resume/
-├── zen-runner/             # Claude-specific (uses zen-mode CLI)
 │   └── resume/
 ├── codebase-cleanup/
 │

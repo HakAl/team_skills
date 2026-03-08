@@ -67,7 +67,6 @@ Learnings about Claude Code platform behavior:
 | `meticulous-matt` | Auditor & Security | Finds all issues, security triage, reports honestly |
 | `greenfield-gary` | Builder & UX Guru | Implements from plans, a11y, i18n expert |
 | `grizzly-gabe` | Fixer & Red Team | Resolves issues, offensive security |
-| `zen-runner` | Executor | Autonomous work, no human-in-loop |
 | `codebase-cleanup` | Utility | Fast automated scans |
 
 ---
