@@ -1,0 +1,223 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: #f4f6f8;
+  color: #18212b;
+  font: 14px/1.45 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+.shell {
+  display: grid;
+  grid-template-columns: minmax(260px, 340px) 1fr;
+  min-height: 100vh;
+}
+
+.rail {
+  background: #17202a;
+  border-right: 1px solid #0d141b;
+  color: #f8fafc;
+  padding: 12px;
+}
+
+.rail-row {
+  align-items: center;
+  background: #243241;
+  border: 1px solid #34495e;
+  border-radius: 6px;
+  color: inherit;
+  cursor: pointer;
+  display: grid;
+  gap: 6px;
+  grid-template-columns: auto 1fr auto auto;
+  margin-bottom: 8px;
+  min-height: 44px;
+  padding: 9px 10px;
+  text-align: left;
+  width: 100%;
+}
+
+.rail-row:hover,
+.rail-row:focus {
+  border-color: #8fb3d9;
+  outline: none;
+}
+
+.rail-row.awaiting {
+  background: #fff7d6;
+  border-color: #c58a00;
+  color: #241a00;
+}
+
+.rail-row.dlq {
+  border-color: #d00000;
+  box-shadow: inset 4px 0 0 #d00000;
+}
+
+.lane {
+  font-weight: 700;
+}
+
+.dispatch {
+  overflow-wrap: anywhere;
+}
+
+.state {
+  color: inherit;
+  font-size: 12px;
+  opacity: 0.82;
+}
+
+.dlq-flag,
+.dlq-banner {
+  background: #d00000;
+  color: white;
+  font-weight: 800;
+}
+
+.dlq-flag {
+  border-radius: 3px;
+  font-size: 11px;
+  padding: 2px 5px;
+}
+
+.rail-empty {
+  color: #b8c2cc;
+  padding: 16px 4px;
+}
+
+.focus {
+  padding: 18px;
+}
+
+.focus-panel {
+  max-width: 1120px;
+}
+
+.focus-header {
+  align-items: center;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+h1,
+h2,
+h3,
+p {
+  margin-top: 0;
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 4px;
+}
+
+h2 {
+  border-bottom: 1px solid #d9e0e7;
+  font-size: 15px;
+  margin-bottom: 8px;
+  padding-bottom: 4px;
+}
+
+h3 {
+  font-size: 13px;
+  margin-bottom: 6px;
+}
+
+section {
+  margin-bottom: 18px;
+}
+
+.meta,
+.empty {
+  color: #52606d;
+}
+
+.approve-button {
+  background: #176f4d;
+  border: 0;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font-weight: 800;
+  min-height: 38px;
+  padding: 0 14px;
+}
+
+.approve-button:hover,
+.approve-button:focus {
+  background: #0d5a3c;
+  outline: 2px solid #8ed4b6;
+}
+
+.dlq-banner {
+  border-radius: 6px;
+  margin-bottom: 16px;
+  padding: 10px 12px;
+}
+
+.evidence-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.evidence-list li {
+  background: white;
+  border: 1px solid #d9e0e7;
+  border-radius: 6px;
+  margin-bottom: 8px;
+  padding: 10px;
+}
+
+.evidence-list p {
+  margin: 4px 0 0;
+}
+
+dl {
+  display: grid;
+  gap: 6px 12px;
+  grid-template-columns: max-content minmax(0, 1fr);
+  margin: 0;
+}
+
+dt {
+  color: #52606d;
+  font-weight: 700;
+}
+
+dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+pre {
+  background: #101820;
+  border-radius: 6px;
+  color: #edf5ff;
+  margin: 0;
+  max-height: 360px;
+  overflow: auto;
+  padding: 12px;
+  white-space: pre-wrap;
+}
+
+@media (max-width: 760px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .rail {
+    border-bottom: 1px solid #0d141b;
+    border-right: 0;
+  }
+
+  .focus-header {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
