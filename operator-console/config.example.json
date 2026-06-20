@@ -1,0 +1,17 @@
+{
+  "agent_comms_root": "/Users/home/dev/agent-comms",
+  "reviews_dir": "local/dispatch/reviews",
+  "db_path": "/Users/home/dev/agent-comms/data/agent-comms.sqlite",
+  "repo_roots": {
+    "air": "/Users/home/dev/ai-research",
+    "pi": "/Users/home/dev/DefenseSector/prompt_injection",
+    "eng": "/Users/home/dev/gh-public/_skills-operator-console"
+  },
+  "allowed_commands": [
+    "git diff",
+    "git diff --staged",
+    "git status --porcelain",
+    "git log"
+  ],
+  "writable_state_roots": []
+}

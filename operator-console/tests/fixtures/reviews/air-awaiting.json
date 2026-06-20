@@ -1,0 +1,16 @@
+{
+  "dispatch_id": "air-awaiting",
+  "state": "review_clean",
+  "repo": "__REPO__",
+  "target_branch": "master",
+  "base_commit": "__BASE_COMMIT__",
+  "reviewed_head": "__REVIEWED_HEAD__",
+  "approved_head": null,
+  "approval": null,
+  "findings": [],
+  "gate_runs": [],
+  "respawn_count": 0,
+  "max_respawns": 3,
+  "updated_at": "2026-06-20T15:00:00Z"
+}
+
