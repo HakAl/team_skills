@@ -83,9 +83,10 @@ cycle-land.sh <dispatch-id> [approver]
      and POST_HEAD==reviewed_head after (no-op-merge footgun guard).
   4. full substrate suite from main (python 3.11 + 3.14).
   5. `review verify`.
-- The console's PTY helper runs the **script path** (`local/bin/cycle-land.sh`),
-  never the `land` shell alias. `approve` / `push_approval create` stay
-  non-allowlisted.
+- Approve path is **stage-and-reflect**: the console STAGES the full script path
+  (`<agent_comms_root>/local/bin/cycle-land.sh <dispatch-id>`), never the `land`
+  shell alias, for the operator to run in their OWN terminal. The web app does not
+  run, spawn, or pipe it. `approve` / `push_approval create` stay non-allowlisted.
 
 ## C. The cosmetic merge line (#4 pending item) -- spike finding
 
@@ -101,10 +102,11 @@ real halt? Spike evidence from this record:
   cycle the land completed; any `fatal:` line seen in the terminal did not
   prevent completion.
 
-**Display contract (safe regardless of the formal #4 ruling):** the console
-displays whatever `cycle-land.sh` emits verbatim (including any `fatal:` line)
-AND surfaces the record `state` plainly. Success == `state == verified`
-(record-authoritative). `human_approved` / `merged` are normal transient land
+**Display contract (stage-and-reflect; safe regardless of the formal #4 ruling):**
+the console does NOT capture or display `cycle-land.sh` stdout -- the operator runs
+the staged command in their own terminal and sees that output (including any
+`fatal:` / cosmetic line) live there. The console surfaces the record `state`
+plainly. Success == `state == verified` (record-authoritative). `human_approved` / `merged` are normal transient land
 states (not a halt); a halt is a cycle stuck below `verified` past its land
 attempt, or a ledger DLQ (section E), and must be visible. Never interpret
 terminal text as the success signal. (Formal cosmetic-vs-distinct confirmation
