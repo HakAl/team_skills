@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -117,6 +118,46 @@ class AppTests(unittest.TestCase):
             self.assertEqual(client.get("/focus/UpperCase/status").status_code, 404)
             self.assertEqual(client.get("/focus/missing-id/status").status_code, 404)
             self.assertEqual(client.get("/focus/other-verified/status").status_code, 404)
+
+    def test_status_and_rail_reflect_state_transition(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            config_path, _repo = _write_fixture_environment(Path(tempdir))
+            config = load_config(config_path)
+            client = TestClient(create_app(config))
+
+            first = client.get("/focus/eng-clean/status")
+            self.assertEqual(first.status_code, 200)
+            self.assertIn("banner awaiting", first.text)
+
+            record_path = config.reviews_dir / "eng-clean.json"
+            record = json.loads(record_path.read_text(encoding="utf-8"))
+            record["state"] = "verified"
+            record_path.write_text(json.dumps(record), encoding="utf-8")
+
+            second = client.get("/focus/eng-clean/status")
+            self.assertEqual(second.status_code, 200)
+            self.assertIn("banner success", second.text)
+            self.assertIn("Verified", second.text)
+
+            rail = client.get("/rail").text
+            marker = 'hx-get="/focus/eng-clean"'
+            marker_index = rail.index(marker)
+            row_start = rail.rfind("<button", 0, marker_index)
+            row_end = rail.index("</button>", marker_index) + len("</button>")
+            row = rail[row_start:row_end]
+            button_attrs = row.split(">", 1)[0]
+            self.assertIn('<span class="state">verified</span>', row)
+            self.assertNotIn("awaiting", button_attrs)
+
+            record["state"] = "escalated"
+            record["escalation"] = {
+                "reason": "stuck land",
+                "timestamp": "2026-06-21T16:00:00Z",
+            }
+            record_path.write_text(json.dumps(record), encoding="utf-8")
+            third = client.get("/focus/eng-clean/status")
+            self.assertIn("banner halt", third.text)
+            self.assertIn("stuck land", third.text)
 
     def test_app_has_no_mutation_endpoints(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
