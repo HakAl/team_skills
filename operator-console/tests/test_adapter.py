@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from console.adapter import list_cycles, load_evidence, validate_work_item
+from console.adapter import list_cycles, load_evidence, load_status, validate_work_item
 from console.adapter import _run_allowed
 from console.config import load_config
 
@@ -76,6 +76,28 @@ class AdapterTests(unittest.TestCase):
 
             with self.assertRaisesRegex(ValueError, "outside configured roots"):
                 load_evidence(config, "other-verified")
+
+    def test_load_status_reads_state_dlq_and_escalation_without_git(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            config_path, _repo = _write_fixture_environment(Path(tempdir))
+            config = load_config(config_path)
+
+            verified = load_status(config, "eng-verified")
+            escalated = load_status(config, "eng-escalated")
+            awaiting = load_status(config, "air-awaiting")
+
+            self.assertEqual(verified.state, "verified")
+            self.assertFalse(verified.dlq)
+            self.assertIsNone(verified.escalation_reason)
+            self.assertEqual(escalated.escalation_reason, "respawn budget exceeded")
+            self.assertTrue(awaiting.dlq)
+            self.assertEqual(awaiting.dlq_reason, "worker failed")
+            with self.assertRaises(KeyError):
+                load_status(config, "missing-id")
+            with self.assertRaises(KeyError):
+                load_status(config, "UpperCase")
+            with self.assertRaisesRegex(ValueError, "outside configured roots"):
+                load_status(config, "other-verified")
 
     def test_config_rejects_writable_roots_and_forbidden_commands(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
@@ -175,6 +197,9 @@ def _write_fixture_environment(tmp_path: Path) -> tuple[Path, Path]:
         "air-awaiting": {"repo": str(repo)},
         "pi-approved": {"repo": str(pi_root)},
         "eng-merged": {"repo": str(eng_root)},
+        "eng-verified": {"repo": str(eng_root)},
+        "eng-escalated": {"repo": str(eng_root)},
+        "eng-clean": {"repo": str(eng_root)},
         "other-verified": {"repo": str(tmp_path / "outside")},
     }
     for dispatch_id, values in replacements.items():

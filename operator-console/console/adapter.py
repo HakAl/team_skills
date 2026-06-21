@@ -55,6 +55,16 @@ class CycleEvidence:
     dlq_at: str | None
 
 
+@dataclass(frozen=True)
+class CycleStatus:
+    dispatch_id: str
+    state: str
+    dlq: bool
+    dlq_reason: str | None
+    dlq_at: str | None
+    escalation_reason: str | None
+
+
 def validate_work_item(s: str) -> bool:
     return bool(WORK_ITEM_RE.fullmatch(s))
 
@@ -135,6 +145,39 @@ def load_evidence(config: Config, work_item: str) -> CycleEvidence:
         dlq=bool(ledger.get("dlq", False)),
         dlq_reason=ledger.get("failure_reason"),
         dlq_at=ledger.get("dlq_at"),
+    )
+
+
+def load_status(config: Config, work_item: str) -> CycleStatus:
+    if not validate_work_item(work_item):
+        raise KeyError(work_item)
+
+    indexed = _review_index(config)
+    review_path = indexed.get(work_item)
+    if review_path is None:
+        raise KeyError(work_item)
+
+    record = _load_review(review_path)
+    dispatch_id = _required_str(record, "dispatch_id")
+    if dispatch_id != work_item:
+        raise ValueError(f"review stem does not match dispatch_id: {work_item}")
+
+    repo = _required_str(record, "repo")
+    if _configured_repo_path(config, repo) is None:
+        raise ValueError(f"repo is outside configured roots: {repo}")
+
+    ledger = _load_dlq_status(config).get(dispatch_id, {})
+    escalation = record.get("escalation")
+    escalation_reason = (
+        escalation.get("reason") if isinstance(escalation, dict) else None
+    )
+    return CycleStatus(
+        dispatch_id=dispatch_id,
+        state=_required_str(record, "state"),
+        dlq=bool(ledger.get("dlq", False)),
+        dlq_reason=ledger.get("failure_reason"),
+        dlq_at=ledger.get("dlq_at"),
+        escalation_reason=escalation_reason,
     )
 
 

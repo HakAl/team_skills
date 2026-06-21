@@ -143,6 +143,44 @@ section {
   padding: 10px 12px;
 }
 
+.banner {
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-weight: 800;
+  margin-bottom: 16px;
+  padding: 10px 12px;
+}
+
+.banner.halt {
+  background: #ffe5e5;
+  border-color: #d00000;
+  color: #7a0000;
+}
+
+.banner.success {
+  background: #e5f7ec;
+  border-color: #1b8f4d;
+  color: #0b4f2c;
+}
+
+.banner.landing {
+  background: #fff3cf;
+  border-color: #b77900;
+  color: #4a3400;
+}
+
+.banner.awaiting {
+  background: #e9f2ff;
+  border-color: #5c8fc7;
+  color: #183b61;
+}
+
+.banner.working {
+  background: #eef1f4;
+  border-color: #c8d0d8;
+  color: #3d4954;
+}
+
 .evidence-list {
   list-style: none;
   margin: 0;

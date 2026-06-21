@@ -80,6 +80,43 @@ class AppTests(unittest.TestCase):
                 f'data-clipboard="{config.agent_comms_root}/local/bin/cycle-land.sh air-awaiting"',
                 body,
             )
+            self.assertIn('hx-get="/focus/air-awaiting/status"', body)
+            self.assertIn("every 5s", body)
+
+    def test_focus_status_endpoint_renders_state_banners(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            config_path, _repo = _write_fixture_environment(Path(tempdir))
+            client = TestClient(create_app(load_config(config_path)))
+
+            response = client.get("/focus/air-awaiting/status")
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("banner halt", response.text)
+            self.assertIn("HALT", response.text)
+            self.assertIn("worker failed", response.text)
+
+            response = client.get("/focus/eng-escalated/status")
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("banner halt", response.text)
+            self.assertIn("respawn budget exceeded", response.text)
+
+            response = client.get("/focus/eng-verified/status")
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("banner success", response.text)
+            self.assertIn("Verified", response.text)
+
+            response = client.get("/focus/eng-merged/status")
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("banner landing", response.text)
+            self.assertIn("Landing", response.text)
+
+            response = client.get("/focus/eng-clean/status")
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("banner awaiting", response.text)
+            self.assertIn("Awaiting", response.text)
+
+            self.assertEqual(client.get("/focus/UpperCase/status").status_code, 404)
+            self.assertEqual(client.get("/focus/missing-id/status").status_code, 404)
+            self.assertEqual(client.get("/focus/other-verified/status").status_code, 404)
 
     def test_app_has_no_mutation_endpoints(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:

@@ -37,6 +37,14 @@ def create_app(config: Config) -> FastAPI:
             raise HTTPException(status_code=404, detail="work item not found")
         return HTMLResponse(_focus(config, evidence))
 
+    @app.get("/focus/{work_item}/status", response_class=HTMLResponse)
+    def focus_status(work_item: str) -> HTMLResponse:
+        try:
+            status = adapter.load_status(config, work_item)
+        except (KeyError, ValueError):
+            raise HTTPException(status_code=404, detail="work item not found")
+        return HTMLResponse(_status_banner(status))
+
     return app
 
 
@@ -99,6 +107,7 @@ def _focus(config: Config, evidence: adapter.CycleEvidence) -> str:
       <p class="meta">state: <strong>{escape(evidence.state)}</strong></p>
     </div>
   </header>
+  <div class="status-region" hx-get="/focus/{escape(evidence.dispatch_id)}/status" hx-trigger="load, every 5s" hx-swap="innerHTML"></div>
   {dlq}
   <section>
     <h2>Findings</h2>
@@ -139,6 +148,25 @@ def _focus(config: Config, evidence: adapter.CycleEvidence) -> str:
     <pre>{escape(evidence.git.staged_diff)}</pre>
   </section>
 </article>"""
+
+
+def _status_banner(status: adapter.CycleStatus) -> str:
+    if status.dlq or status.state == "escalated":
+        if status.state == "escalated" and status.escalation_reason:
+            detail = status.escalation_reason
+        else:
+            detail = f"{status.dlq_reason or 'DLQ'} {status.dlq_at or ''}"
+        return f'<div class="banner halt">HALT: {escape(detail)}</div>'
+    if status.state == "verified":
+        return '<div class="banner success">Verified - land complete</div>'
+    if status.state in {"human_approved", "merged"}:
+        return (
+            f'<div class="banner landing">Landing in progress '
+            f"({escape(status.state)})</div>"
+        )
+    if status.state == "review_clean":
+        return '<div class="banner awaiting">Awaiting land</div>'
+    return f'<div class="banner working">Working ({escape(status.state)})</div>'
 
 
 def _findings(findings: list[dict[str, Any]]) -> str:
