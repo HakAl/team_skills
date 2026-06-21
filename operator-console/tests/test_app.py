@@ -84,6 +84,17 @@ class AppTests(unittest.TestCase):
             self.assertIn('hx-get="/focus/air-awaiting/status"', body)
             self.assertIn("every 5s", body)
 
+    def test_focus_degrades_when_git_unreadable(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            config_path, _repo = _write_fixture_environment(Path(tempdir))
+            client = TestClient(create_app(load_config(config_path)))
+
+            response = client.get("/focus/eng-verified")
+
+            self.assertEqual(response.status_code, 200)
+            self.assertIn("Git evidence unavailable", response.text)
+            self.assertIn("verified", response.text)
+
     def test_focus_status_endpoint_renders_state_banners(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
             config_path, _repo = _write_fixture_environment(Path(tempdir))

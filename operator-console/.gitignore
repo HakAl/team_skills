@@ -3,3 +3,8 @@ __pycache__/
 *.pyo
 .pytest_cache/
 .uv-cache/
+config.json
+.console.pid
+.console.log
+*.pid
+*.log

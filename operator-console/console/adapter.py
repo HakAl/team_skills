@@ -50,6 +50,7 @@ class CycleEvidence:
     repo: str
     target_branch: str
     git: GitEvidence
+    git_available: bool
     dlq: bool
     dlq_reason: str | None
     dlq_at: str | None
@@ -116,17 +117,25 @@ def load_evidence(config: Config, work_item: str) -> CycleEvidence:
     reviewed_head = _optional_str(record, "reviewed_head", "")
     ledger = _load_dlq_status(config).get(dispatch_id, {})
     git = GitEvidence("", "", "", "")
+    git_available = True
     if base_commit and reviewed_head:
-        git = GitEvidence(
-            committed_delta=_run_allowed(
-                config, ["git", "-C", str(repo_path), "diff", f"{base_commit}..{reviewed_head}"]
-            ),
-            dirty_diff=_run_allowed(config, ["git", "-C", str(repo_path), "diff"]),
-            staged_diff=_run_allowed(config, ["git", "-C", str(repo_path), "diff", "--staged"]),
-            status_porcelain=_run_allowed(
-                config, ["git", "-C", str(repo_path), "status", "--porcelain"]
-            ),
-        )
+        try:
+            git = GitEvidence(
+                committed_delta=_run_allowed(
+                    config,
+                    ["git", "-C", str(repo_path), "diff", f"{base_commit}..{reviewed_head}"],
+                ),
+                dirty_diff=_run_allowed(config, ["git", "-C", str(repo_path), "diff"]),
+                staged_diff=_run_allowed(
+                    config, ["git", "-C", str(repo_path), "diff", "--staged"]
+                ),
+                status_porcelain=_run_allowed(
+                    config, ["git", "-C", str(repo_path), "status", "--porcelain"]
+                ),
+            )
+        except (subprocess.CalledProcessError, FileNotFoundError):
+            git = GitEvidence("", "", "", "")
+            git_available = False
 
     return CycleEvidence(
         dispatch_id=dispatch_id,
@@ -142,6 +151,7 @@ def load_evidence(config: Config, work_item: str) -> CycleEvidence:
         repo=repo,
         target_branch=_required_str(record, "target_branch"),
         git=git,
+        git_available=git_available,
         dlq=bool(ledger.get("dlq", False)),
         dlq_reason=ledger.get("failure_reason"),
         dlq_at=ledger.get("dlq_at"),

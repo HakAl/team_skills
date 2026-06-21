@@ -100,6 +100,7 @@ def _focus(config: Config, evidence: adapter.CycleEvidence) -> str:
     )
     approval = _approval(evidence.approval)
     dlq = _dlq(evidence)
+    git_evidence = _git_evidence(evidence)
     return f"""<article class="focus-panel">
   <header class="focus-header">
     <div>
@@ -134,19 +135,7 @@ def _focus(config: Config, evidence: adapter.CycleEvidence) -> str:
     <pre>{escape(command)}</pre>
     <button type="button" class="copy-command" data-clipboard="{escape(command)}">Copy command</button>
   </section>
-  <section>
-    <h2>Committed Git Diff</h2>
-    <pre>{escape(evidence.git.committed_delta)}</pre>
-  </section>
-  <section>
-    <h2>Dirty Tree Status</h2>
-    <h3>status --porcelain</h3>
-    <pre>{escape(evidence.git.status_porcelain)}</pre>
-    <h3>diff</h3>
-    <pre>{escape(evidence.git.dirty_diff)}</pre>
-    <h3>diff --staged</h3>
-    <pre>{escape(evidence.git.staged_diff)}</pre>
-  </section>
+  {git_evidence}
 </article>"""
 
 
@@ -215,3 +204,28 @@ def _dlq(evidence: adapter.CycleEvidence) -> str:
     reason = escape(evidence.dlq_reason or "DLQ flagged")
     at = escape(evidence.dlq_at or "")
     return f'<div class="dlq-banner">DLQ: {reason} {at}</div>'
+
+
+def _git_evidence(evidence: adapter.CycleEvidence) -> str:
+    if not evidence.git_available:
+        return (
+            '<section>'
+            '<p class="git-unavailable">'
+            "Git evidence unavailable for this cycle "
+            f"(repo not readable at {escape(evidence.repo)})."
+            "</p>"
+            "</section>"
+        )
+    return f"""<section>
+    <h2>Committed Git Diff</h2>
+    <pre>{escape(evidence.git.committed_delta)}</pre>
+  </section>
+  <section>
+    <h2>Dirty Tree Status</h2>
+    <h3>status --porcelain</h3>
+    <pre>{escape(evidence.git.status_porcelain)}</pre>
+    <h3>diff</h3>
+    <pre>{escape(evidence.git.dirty_diff)}</pre>
+    <h3>diff --staged</h3>
+    <pre>{escape(evidence.git.staged_diff)}</pre>
+  </section>"""

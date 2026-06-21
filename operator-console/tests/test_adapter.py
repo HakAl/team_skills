@@ -55,6 +55,21 @@ class AdapterTests(unittest.TestCase):
             self.assertIn("MM tracked.txt", evidence.git.status_porcelain)
             self.assertEqual(evidence.repo, str(repo))
 
+    def test_load_evidence_degrades_when_repo_git_unreadable(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            config_path, _repo = _write_fixture_environment(Path(tempdir))
+            config = load_config(config_path)
+
+            evidence = load_evidence(config, "eng-verified")
+
+            self.assertFalse(evidence.git_available)
+            self.assertEqual(evidence.git.committed_delta, "")
+            self.assertEqual(evidence.git.dirty_diff, "")
+            self.assertEqual(evidence.git.staged_diff, "")
+            self.assertEqual(evidence.git.status_porcelain, "")
+            self.assertEqual(evidence.state, "verified")
+            self.assertTrue(evidence.repo)
+
     def test_load_evidence_rejects_unknown_and_traversal(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
             config_path, _repo = _write_fixture_environment(Path(tempdir))
