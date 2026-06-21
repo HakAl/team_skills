@@ -45,15 +45,36 @@ The single source-of-design docs (read in this order on resume):
   spawns. ff-merges into `_skills` master (LOCAL) at the very end.
 - **Do not `git push` any of this.** It is all local (operator directive).
 
-## 3. Current state (snapshot 2026-06-21)
+## 3. Current state (snapshot 2026-06-21, session 2)
 
 - **Cycle `operator-console-phase1`**: state `dispatched`, respawn_count **1/3**,
-  findings `[F1 blocking OPEN]`, brief_checks 3 rounds (codex r1, codex r2,
-  cold-review -- all converged + recorded). repo + target_branch correct.
+  findings `[F1 blocking OPEN]`, brief_checks recorded. repo + target_branch
+  correct. (Record state UNCHANGED this session -- only informal dispatch +
+  architect doc/config edits below; no review.py transitions.)
 - **Worktree commits** (local only, no push):
   - `f74ccfa` work-item 2 (config + read adapter)
   - `46ea629` work-item 3 (shell + rail + focus)
-  - (plus a docs commit landing this handoff + the stage-and-reflect substrate-contract revision)
+  - `ca8d55b` docs commit (prior handoff + stage-and-reflect contract revision)
+  - (this session adds one more docs/config commit: the contract scrubs + the
+    b0 db_path cutover + this handoff update -- see below)
+- **This session (session 2) did, with operator OK:**
+  - **wi4 brief-check** (informal `dispatch_agent`, key
+    `...-briefcheck-wi4-r1`): codex verdict GAPS-FOUND but wi4 CONFIRMED
+    buildable as a pure focus-panel/shell/static change, no new routes. The
+    "gaps" were doc-consistency + test-precision items, all resolved or folded
+    into the wi4 spec (section 5). NOT a review.py brief-check; record untouched.
+  - **agentcomms-architect reviewed the cycle + spike: POSITIVE.** Spike accurate;
+    stage-and-reflect approve path explicitly endorsed as "a sound trust
+    boundary." Raised two consumer-side items (both handled, see below).
+  - **substrate-contract.md scrubbed (3 edits):** removed stale PTY-helper
+    sentence (section B), changed "APPROVE is enabled only for configured roots"
+    -> "staged land command is shown only..." (section D), and rewrote the
+    section E db_path parenthetical for the b0 cutover.
+  - **b0 ledger DB cutover handled (operator ran the cutover this session).**
+    Canonical ledger moved `<repo>/data/agent-comms.sqlite` -> 
+    `~/.agent-comms/agent-comms.sqlite` (legacy frozen). `config.py` default and
+    `config.example.json` now point at `~/.agent-comms/agent-comms.sqlite`.
+    Gate still 11/11 (tests use a fixture DB, not the real path).
 - **Built + verified (gate green, 11 tests under py3.11):**
   - wi1 spike (substrate-contract.md)
   - wi2 `console/config.py`, `console/adapter.py`, `config.example.json`, tests
@@ -98,22 +119,42 @@ The single source-of-design docs (read in this order on resume):
   record `repo` vs config repo_roots {air,pi,eng} else [other]; input validated
   by regex `^[a-z0-9][a-z0-9-]*$` + allowlist-resolve against existing stems.
 
-## 5. IMMEDIATE next step (pending operator OK)
+## 5. IMMEDIATE next step: dispatch wi4 impl (brief-check DONE)
 
-Dispatch **work-item 4 (intent staging)** on the revised stage-and-reflect spec.
-It MODIFIES the wi3 focus panel (does not add endpoints):
-- In `console/app.py` `_focus(...)`: replace the `<form hx-post="/approve/...">`
-  APPROVE button with an "Action Required" block showing the exact full-path
-  `cycle-land.sh <dispatch-id>` command (already computed there) in a <code>/<pre>
-  + a copy-to-clipboard button (a few lines of local vanilla JS in the shell or a
-  small static/app.js, no library, no CDN).
-- No POST routes. No helper. Keep everything html-escaped.
-- Tests: assert the focus partial contains the exact staged command and the copy
-  control, and that NO POST/approve route exists on the app.
-- Worker can't run web tests; architect runs the gate.
+The wi4 brief-check is complete and the approve-path scrubs are committed, so the
+next action is the wi4 IMPLEMENTATION dispatch to `engineering-codex-worker`
+(formal `dispatch_agent`, idempotency key `operator-console-phase1-impl-wi4-r1`,
+then `wait_for_reply`). Do this on resume (no further operator gate needed unless
+the operator wants one). wi4 MODIFIES the wi3 focus panel; it adds NO endpoints.
 
-Operator offered two options before dispatch: (1) dispatch wi4 now, or (2) one
-quick codex brief-check on the revised approve-path spec first. CONFIRM which.
+The spec, with the brief-check tightenings already baked in:
+- In `console/app.py` `_focus(...)`: REMOVE the dead `<form hx-post="/approve/...">`
+  APPROVE button (currently ~lines 100-102; there is no POST route, the form is
+  dead). Present the already-computed exact full-path `cycle-land.sh <dispatch-id>`
+  command (the existing "Staged Land Command" <pre>, ~lines 126-128) as an
+  "Action Required" block WITH a copy-to-clipboard button.
+- Copy JS lives in a NEW `static/app.js` referenced by one `<script
+  src="/static/app.js">` tag in `_page_shell()`. `/static` is ALREADY mounted via
+  StaticFiles (`app.py:17-18`) -- no new mount needed. Vanilla `navigator.clipboard`,
+  no library, no CDN. Everything html-escaped.
+- Pin the copied value EXACTLY: one line, `<agent_comms_root>/local/bin/
+  cycle-land.sh <id>`, exactly one ASCII space before `<id>`, NO trailing newline,
+  NO approver arg, NO quoting.
+- Tests: assert the focus partial contains the exact staged command + the copy
+  control. For "NO mutation endpoint", strongest assertion = inspect the FastAPI
+  route table and assert no `/approve*` path / no non-GET method, AND
+  `client.post("/focus" or "/approve/air-awaiting").status_code == 404`. Rename
+  `test_focus_renders_evidence_and_staged_approve_form` and INVERT its old
+  `hx-post="/approve/..."` positive assertion (`tests/test_app.py:52,75`).
+- Cleanup the now-orphan `.approve-button` CSS (`static/app.css:~140-155`).
+- Worker has NO network -> can't run the fastapi web tests; ARCHITECT runs the
+  full gate (section 4) after committing wi4 NAMED files.
+
+**Carry-forward into wi5 (state reflection):** when surfacing verify metadata,
+read `record.get("verification")` -- `verification` is verify-only (ABSENT until
+`state == verified`), per agentcomms-architect. Key success off `state ==
+verified`, never off the presence of the `verification` field. (Adapter does NOT
+access it today, so no current bug.)
 
 ## 6. Remaining work after wi4
 
@@ -185,5 +226,9 @@ quick codex brief-check on the revised approve-path spec first. CONFIRM which.
 4. Confirm the record state: `python3 -c "import json;
    print(json.load(open('/Users/home/dev/agent-comms/local/dispatch/reviews/
    operator-console-phase1.json'))['state'])"` (expect `dispatched`).
-5. Ask the operator: dispatch wi4 now, or brief-check the revised approve-path
-   first? Then proceed per section 5.
+5. Confirm the b0 cutover landed: `ls -l ~/.agent-comms/agent-comms.sqlite`
+   (the canonical ledger the console now reads for the DLQ join). If absent, the
+   cutover did not complete -- flag to the operator before relying on DLQ.
+6. Brief-check is DONE. Proceed per section 5: dispatch wi4 impl
+   (`operator-console-phase1-impl-wi4-r1`), review the diff adversarially, commit
+   wi4 NAMED files, run the gate. Then wi5, wi6, final governed review + land.

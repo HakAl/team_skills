@@ -76,8 +76,9 @@ cycle-land.sh <dispatch-id> [approver]
 - Precondition: record `state == review_clean` (else fail-fast, nothing merged).
 - `set -euo pipefail`; five steps:
   1. `review approve` -- reads **/dev/tty** directly (the real human gate; a
-     non-tty invocation makes approve refuse). THIS is why the console needs a
-     PTY helper, not a FastAPI shell-out.
+     non-tty invocation makes approve refuse). THIS is why the console STAGES the
+     command for the operator's own terminal (where /dev/tty is real) and never
+     runs approve itself; no PTY helper, no FastAPI shell-out.
   2. `review gate-merge` -- clean tree + HEAD==approved==reviewed + signature verify.
   3. ff-merge `target_branch` into main, guarded by SRC_TIP==reviewed_head before
      and POST_HEAD==reviewed_head after (no-op-merge footgun guard).
@@ -122,8 +123,8 @@ Lane comes from the record `repo` path matched against config `repo_roots`:
   work per DoD #6). This is why `repo_roots` must include the build worktree.
 
 A `repo` outside ALL configured roots renders under a neutral `[other]` group,
-counted and surfaced, never silently dropped (invariant #5); APPROVE is enabled
-only for configured roots. The reviews dir holds many out-of-lane records
+counted and surfaced, never silently dropped (invariant #5); the staged land
+command is shown only for configured roots. The reviews dir holds many out-of-lane records
 (`agent-comms-dogfood`, etc.); they belong in `[other]`, not a known lane.
 
 ## E. DLQ + worker lifecycle (SQLite ledger, NOT the review record)
@@ -134,8 +135,12 @@ DLQ is a **dispatch-ledger** status, not a review state. Confirmed in
 with `dlq_at` and `failure_reason` columns.
 
 So "DLQ flagged" on the rail (DoD #1) is a **join**, not a review-record field:
-- read the SQLite DB at `config.db_path` (resolves via
-  `agent_comms.paths.db_path()` = `REPO_ROOT/data/agent-comms.sqlite`),
+- read the SQLite DB at `config.db_path`. The canonical ledger path is what
+  `agent_comms.paths.db_path()` returns AT RUNTIME. NOTE (b0 cutover, scheduled):
+  this moves from the legacy `REPO_ROOT/data/agent-comms.sqlite` (retained
+  frozen, no new rows post-cutover) to `~/.agent-comms/agent-comms.sqlite`.
+  Config `db_path` must track the canonical path, not the frozen legacy one, or
+  the DLQ signal silently reads a stale DB (invariant #5 violation),
 - key on the cycle's `dispatch_id` (== review record `dispatch_id`),
 - flag when ledger `status in ('dlq', 'spawn_failed_message_landed')`; show
   `failure_reason` + `dlq_at`.

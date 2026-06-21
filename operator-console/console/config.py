@@ -37,7 +37,7 @@ def load_config(path: str | Path) -> Config:
     agent_comms_root = _resolve_path(raw["agent_comms_root"])
     reviews_dir = _resolve_path(raw["reviews_dir"], base=agent_comms_root)
     db_path = _resolve_path(
-        raw.get("db_path", agent_comms_root / "data" / "agent-comms.sqlite"),
+        raw.get("db_path", Path("~/.agent-comms/agent-comms.sqlite")),
         base=agent_comms_root,
     )
 

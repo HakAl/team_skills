@@ -1,7 +1,7 @@
 {
   "agent_comms_root": "/Users/home/dev/agent-comms",
   "reviews_dir": "local/dispatch/reviews",
-  "db_path": "/Users/home/dev/agent-comms/data/agent-comms.sqlite",
+  "db_path": "~/.agent-comms/agent-comms.sqlite",
   "repo_roots": {
     "air": "/Users/home/dev/ai-research",
     "pi": "/Users/home/dev/DefenseSector/prompt_injection",
