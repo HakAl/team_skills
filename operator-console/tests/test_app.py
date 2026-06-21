@@ -4,6 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
+from fastapi.routing import APIRoute
 from fastapi.testclient import TestClient
 
 from console.app import create_app
@@ -23,6 +24,7 @@ class AppTests(unittest.TestCase):
             self.assertIn('id="rail"', response.text)
             self.assertIn('id="focus"', response.text)
             self.assertIn('/static/htmx.min.js', response.text)
+            self.assertIn('/static/app.js', response.text)
             self.assertIn('/static/app.css', response.text)
             self.assertIn('hx-get="/rail"', response.text)
             self.assertIn('every 5s', response.text)
@@ -49,7 +51,7 @@ class AppTests(unittest.TestCase):
             self.assertIn('hx-get="/focus/air-awaiting"', body)
             self.assertIn('hx-target="#focus"', body)
 
-    def test_focus_renders_evidence_and_staged_approve_form(self) -> None:
+    def test_focus_renders_evidence_and_action_required_copy_block(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:
             config_path, _repo = _write_fixture_environment(Path(tempdir))
             config = load_config(config_path)
@@ -72,7 +74,27 @@ class AppTests(unittest.TestCase):
                 f"{config.agent_comms_root}/local/bin/cycle-land.sh air-awaiting",
                 body,
             )
-            self.assertIn('hx-post="/approve/air-awaiting"', body)
+            self.assertNotIn('hx-post="/approve/', body)
+            self.assertIn("copy-command", body)
+            self.assertIn(
+                f'data-clipboard="{config.agent_comms_root}/local/bin/cycle-land.sh air-awaiting"',
+                body,
+            )
+
+    def test_app_has_no_mutation_endpoints(self) -> None:
+        with tempfile.TemporaryDirectory() as tempdir:
+            config_path, _repo = _write_fixture_environment(Path(tempdir))
+            app = create_app(load_config(config_path))
+            client = TestClient(app)
+
+            app_routes = [
+                route for route in app.routes if isinstance(route, APIRoute)
+            ]
+            self.assertFalse(
+                any(route.path.startswith("/approve") for route in app_routes)
+            )
+            self.assertTrue(all(route.methods == {"GET"} for route in app_routes))
+            self.assertEqual(client.post("/approve/air-awaiting").status_code, 404)
 
     def test_focus_rejects_bad_regex_and_unknown_work_items(self) -> None:
         with tempfile.TemporaryDirectory() as tempdir:

@@ -137,23 +137,6 @@ section {
   color: #52606d;
 }
 
-.approve-button {
-  background: #176f4d;
-  border: 0;
-  border-radius: 6px;
-  color: white;
-  cursor: pointer;
-  font-weight: 800;
-  min-height: 38px;
-  padding: 0 14px;
-}
-
-.approve-button:hover,
-.approve-button:focus {
-  background: #0d5a3c;
-  outline: 2px solid #8ed4b6;
-}
-
 .dlq-banner {
   border-radius: 6px;
   margin-bottom: 16px;
@@ -204,6 +187,24 @@ pre {
   overflow: auto;
   padding: 12px;
   white-space: pre-wrap;
+}
+
+.copy-command {
+  background: #176f4d;
+  border: 0;
+  border-radius: 6px;
+  color: white;
+  cursor: pointer;
+  font-weight: 700;
+  margin-top: 8px;
+  min-height: 34px;
+  padding: 0 12px;
+}
+
+.copy-command:hover,
+.copy-command:focus {
+  background: #0d5a3c;
+  outline: 2px solid #8ed4b6;
 }
 
 @media (max-width: 760px) {

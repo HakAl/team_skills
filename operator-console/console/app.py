@@ -49,6 +49,7 @@ def _page_shell() -> str:
   <title>Operator Console</title>
   <link rel="stylesheet" href="/static/app.css">
   <script src="/static/htmx.min.js"></script>
+  <script src="/static/app.js"></script>
 </head>
 <body>
   <main class="shell">
@@ -97,9 +98,6 @@ def _focus(config: Config, evidence: adapter.CycleEvidence) -> str:
       <h1>{escape(evidence.dispatch_id)}</h1>
       <p class="meta">state: <strong>{escape(evidence.state)}</strong></p>
     </div>
-    <form hx-post="/approve/{escape(evidence.dispatch_id)}" hx-target="#focus" method="post">
-      <button class="approve-button" type="submit">APPROVE</button>
-    </form>
   </header>
   {dlq}
   <section>
@@ -122,9 +120,10 @@ def _focus(config: Config, evidence: adapter.CycleEvidence) -> str:
       <dt>approval</dt><dd>{approval}</dd>
     </dl>
   </section>
-  <section>
-    <h2>Staged Land Command</h2>
+  <section class="action-required">
+    <h2>Action Required</h2>
     <pre>{escape(command)}</pre>
+    <button type="button" class="copy-command" data-clipboard="{escape(command)}">Copy command</button>
   </section>
   <section>
     <h2>Committed Git Diff</h2>
