@@ -12,6 +12,24 @@
       <div class="identity" id="identity" title="every message is sent as this identity">
         acting as <strong id="me">jac</strong>
       </div>
+      <!-- Status is fully built but HIDDEN: post_status rejects the operator_mailbox
+           seat ("unknown agent" - jac is an actor, not an agent). Requested the fix
+           from agentcomms-architect; remove `hidden` (and re-add tests/status.mjs to
+           the verify script) once the seat can publish status. -->
+      <div class="status-wrap" id="statusWrap" hidden>
+        <button class="btn ghost" id="statusBtn" type="button">Status</button>
+        <span class="status-display" id="statusDisplay" title="Last status set in this app. The server has no status read-back."></span>
+        <form class="status-popover" id="statusForm" hidden>
+          <label for="statusSummary">Summary</label>
+          <input id="statusSummary" required placeholder="Current status" />
+          <label for="statusNext">Next step</label>
+          <input id="statusNext" placeholder="Next step" />
+          <div class="status-actions">
+            <button class="btn ghost" type="button" id="statusCancel">Cancel</button>
+            <button class="btn primary" type="submit" id="statusPublish">Publish</button>
+          </div>
+        </form>
+      </div>
       <button class="btn primary" id="composeBtn">Compose</button>
     </header>
 
@@ -36,6 +54,11 @@
             <span id="rWhen"></span>
           </div>
           <div class="body" id="rBody"></div>
+
+          <div class="ack-box" id="ackBox" hidden>
+            <input id="ackResponse" placeholder="Optional acknowledgement response" />
+            <button class="btn primary" type="button" id="ackBtn">Acknowledge</button>
+          </div>
 
           <div class="sender-all" id="senderAll" hidden>
             <button class="btn ghost" type="button" id="viewAllBtn"></button>

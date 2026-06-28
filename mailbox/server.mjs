@@ -4,7 +4,15 @@ import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
 import { dirname, join, normalize, extname } from "node:path";
-import { listInbox, readMessage, sendMessage, listActors, shutdown } from "./mail.mjs";
+import {
+  listInbox,
+  readMessage,
+  sendMessage,
+  listActors,
+  ackMessage,
+  postStatus,
+  shutdown,
+} from "./mail.mjs";
 import { PORT, HOST, ACTOR_DISPLAY, ACTOR_ID } from "./config.mjs";
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
@@ -116,8 +124,22 @@ const server = createServer(async (req, res) => {
         subject: b.subject || "(no subject)",
         body: b.body,
         parentMessageId: b.parentMessageId || null,
+        requiresAck: !!b.requiresAck,
       });
       return sendJson(res, 200, { ok: true, result });
+    }
+    if (path === "/api/ack" && req.method === "POST") {
+      const b = await readBody(req);
+      if (!b.id) return sendJson(res, 400, { error: "missing id" });
+      await ackMessage(b.id, b.response || "");
+      return sendJson(res, 200, { ok: true });
+    }
+    if (path === "/api/status" && req.method === "POST") {
+      const b = await readBody(req);
+      const summary = String(b.summary || "").trim();
+      if (!summary) return sendJson(res, 400, { error: "empty summary" });
+      await postStatus({ summary, nextStep: b.nextStep || "" });
+      return sendJson(res, 200, { ok: true });
     }
     if (req.method === "GET") return serveStatic(res, path);
     res.writeHead(404);

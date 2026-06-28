@@ -12,7 +12,9 @@
     "e2e:autocomplete": "node tests/autocomplete.mjs",
     "e2e:view-all": "node tests/view-all.mjs",
     "e2e:compose-draft": "node tests/compose-draft.mjs",
-    "verify": "node tests/e2e.mjs && node tests/autocomplete.mjs && node tests/view-all.mjs && node tests/compose-draft.mjs && node scripts/cleanup-tests.mjs"
+    "e2e:ack": "node tests/ack.mjs",
+    "e2e:status": "node tests/status.mjs",
+    "verify": "node tests/e2e.mjs && node tests/autocomplete.mjs && node tests/view-all.mjs && node tests/compose-draft.mjs && node tests/ack.mjs && node scripts/cleanup-tests.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0"

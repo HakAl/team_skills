@@ -79,10 +79,11 @@ export function readMessage(messageId) {
   return call("read_message", { message_id: messageId });
 }
 
-export function sendMessage({ toAgents, subject, body, refs, parentMessageId } = {}) {
+export function sendMessage({ toAgents, subject, body, refs, parentMessageId, requiresAck } = {}) {
   const args = { to_agents: toAgents, subject, body };
   if (refs && refs.length) args.refs = refs;
   if (parentMessageId) args.parent_message_id = parentMessageId;
+  if (requiresAck !== undefined) args.requires_ack = !!requiresAck;
   return call("send_message", args);
 }
 
@@ -93,6 +94,14 @@ export function listActors() {
 // Triage (full UI for this is NEXT). Exposed now for the test-cleanup script.
 export function closeMessage(messageId, response = "") {
   return call("close_message", { message_id: messageId, response });
+}
+
+export function ackMessage(messageId, response = "") {
+  return call("ack_message", { message_id: messageId, response });
+}
+
+export function postStatus({ summary, nextStep } = {}) {
+  return call("post_status", { summary, next_step: nextStep || "" });
 }
 
 // Close the MCP client and terminate the child server process. Idempotent.

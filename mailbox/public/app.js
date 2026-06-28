@@ -2,6 +2,7 @@
 const $ = (id) => document.getElementById(id);
 const layout = $("layout");
 const DRAFT_KEY = "mailbox.compose.draft";
+const STATUS_KEY = "mailbox.status";
 
 let selectedId = null;
 
@@ -35,6 +36,17 @@ function esc(s) {
 // Groups stay expanded across reloads (read/send refresh the list).
 const expandedGroups = new Set();
 
+function needsAck(m) {
+  return !!m && m.requires_ack === true && m.status !== "acknowledged" && m.status !== "closed";
+}
+
+function ackFlag() {
+  const flag = document.createElement("span");
+  flag.className = "ack-flag";
+  flag.textContent = "ack";
+  return flag;
+}
+
 function makeMsgRow(m, { showFrom } = {}) {
   const li = document.createElement("li");
   li.className = "msg" + (m.status === "sent" ? " unread" : "") + (m.id === selectedId ? " selected" : "");
@@ -52,6 +64,7 @@ function makeMsgRow(m, { showFrom } = {}) {
   subj.className = "subj";
   subj.textContent = esc(m.subject) || "(no subject)";
   li.append(dot, from, when, subj);
+  if (needsAck(m)) li.appendChild(ackFlag());
   li.addEventListener("click", () => openMessage(m.id));
   return li;
 }
@@ -76,6 +89,7 @@ function renderInbox(messages) {
     msgs.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
     const latest = msgs[0];
     const unread = msgs.filter((m) => m.status === "sent").length;
+    const groupNeedsAck = msgs.some(needsAck);
     const expanded = expandedGroups.has(sender);
 
     const group = document.createElement("li");
@@ -90,6 +104,7 @@ function renderInbox(messages) {
       `<span class="when">${fmtWhen(latest.created_at)}</span>` +
       `<span class="count">${msgs.length}</span>` +
       `<span class="subj">${esc(latest.subject) || "(no subject)"}</span>`;
+    if (groupNeedsAck) head.appendChild(ackFlag());
     head.addEventListener("click", () => {
       if (expandedGroups.has(sender)) expandedGroups.delete(sender);
       else expandedGroups.add(sender);
@@ -230,6 +245,7 @@ async function openMessage(id) {
     $("rFrom").textContent = "From: " + esc(senderLabel(message.from));
     $("rWhen").textContent = fmtWhen(message.created_at);
     $("rBody").textContent = esc(message.body);
+    renderAckControl(message);
     renderThread(thread);
     setupSenderAll(message.from);
     // store reply context
@@ -241,6 +257,36 @@ async function openMessage(id) {
     loadInbox();
   } catch (e) {
     toast("Open failed: " + e.message, true);
+  }
+}
+
+function renderAckControl(message) {
+  const cached = inboxMessages.find((m) => m.id === selectedId);
+  const show = needsAck(message) || (
+    message &&
+    message.requires_ack === undefined &&
+    needsAck(cached)
+  );
+  $("ackBox").hidden = !show;
+  $("ackResponse").value = "";
+}
+
+async function acknowledgeMessage() {
+  if (!selectedId) return;
+  $("ackBtn").disabled = true;
+  try {
+    await api("/api/ack", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ id: selectedId, response: $("ackResponse").value }),
+    });
+    toast("Acknowledged");
+    await loadInbox();
+    await openMessage(selectedId);
+  } catch (e) {
+    toast("Acknowledge failed: " + e.message, true);
+  } finally {
+    $("ackBtn").disabled = false;
   }
 }
 
@@ -484,6 +530,42 @@ async function loadMe() {
   } catch { /* keep default */ }
 }
 
+function restoreStatus() {
+  try {
+    const status = JSON.parse(localStorage.getItem(STATUS_KEY) || "null");
+    if (status && status.summary) $("statusDisplay").textContent = status.summary;
+  } catch { /* ignore bad local state */ }
+}
+
+function toggleStatusForm(show) {
+  const form = $("statusForm");
+  form.hidden = show === undefined ? !form.hidden : !show;
+  if (!form.hidden) $("statusSummary").focus();
+}
+
+async function publishStatus(ev) {
+  ev.preventDefault();
+  const summary = $("statusSummary").value.trim();
+  const nextStep = $("statusNext").value.trim();
+  if (!summary) return toast("Status summary is required", true);
+  $("statusPublish").disabled = true;
+  try {
+    await api("/api/status", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ summary, nextStep }),
+    });
+    $("statusDisplay").textContent = summary;
+    localStorage.setItem(STATUS_KEY, JSON.stringify({ summary, nextStep }));
+    toggleStatusForm(false);
+    toast("Status published");
+  } catch (e) {
+    toast("Status failed: " + e.message, true);
+  } finally {
+    $("statusPublish").disabled = false;
+  }
+}
+
 // wire up
 $("recipientInput").addEventListener("click", () => $("cTo").focus());
 $("cTo").addEventListener("input", () => {
@@ -510,6 +592,10 @@ $("composeForm").addEventListener("submit", sendCompose);
 $("replyForm").addEventListener("submit", sendReply);
 $("refreshBtn").addEventListener("click", loadInbox);
 $("viewAllBtn").addEventListener("click", toggleSenderAll);
+$("ackBtn").addEventListener("click", acknowledgeMessage);
+$("statusBtn").addEventListener("click", () => toggleStatusForm());
+$("statusCancel").addEventListener("click", () => toggleStatusForm(false));
+$("statusForm").addEventListener("submit", publishStatus);
 $("backBtn").addEventListener("click", () => {
   layout.classList.remove("reading-open");
 });
@@ -517,4 +603,5 @@ $("backBtn").addEventListener("click", () => {
 loadMe();
 loadActors();
 restoreDraft();
+restoreStatus();
 loadInbox();
