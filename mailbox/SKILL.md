@@ -47,6 +47,14 @@ Node backend + plain HTML/JS, no bundler. Webkit for e2e (chrome is not installe
     every message that sender has sent jac (snippets, scrollable, reply box stays).
     One-sided by design: the seat has no sent-items tool, so jac's replies are not
     shown. The caption says so.
+  - Acknowledge - messages that need ack (`requires_ack` and not yet acknowledged) show
+    an amber "ack" flag in the inbox (row + conversation); opening one shows an
+    Acknowledge button with an optional response, backed by `ack_message` via
+    `POST /api/ack`. Acking clears the flag.
+  - Status (`post_status`) is BUILT but HIDDEN (`#statusWrap` has `hidden`): the
+    operator_mailbox seat rejects `post_status` with "unknown agent" (jac is an actor,
+    not an agent). Awaiting an agent-comms fix; remove `hidden` and re-add
+    `tests/status.mjs` to `verify` once the seat can publish status.
 - `scripts/check-connection.mjs` - step 0: prove the MCP client boots as jac.
 - `tests/e2e.mjs` - webkit happy path (all sends self-targeted, so it never pings a
   real architect).
@@ -56,6 +64,10 @@ Node backend + plain HTML/JS, no bundler. Webkit for e2e (chrome is not installe
   targets an already-read sender so it mutates no unread state).
 - `tests/compose-draft.mjs` - webkit: draft autosave (reload restores fields, outside
   click does not dismiss, send clears the draft, Discard clears it). Self-targeted.
+- `tests/ack.mjs` - webkit: mints a `requires_ack` self-message, verifies the inbox
+  flag + Acknowledge control, acks it, verifies the flag clears. In `verify`.
+- `tests/status.mjs` - webkit: status publish flow. NOT in `verify` (blocked: seat
+  rejects `post_status`); kept for when the substrate supports it.
 - `scripts/cleanup-tests.mjs` - close the self-test messages e2e leaves behind
   (matches the `mailbox self-test`, `mailbox e2e-*`, `mailbox compose-draft-*` markers).
 

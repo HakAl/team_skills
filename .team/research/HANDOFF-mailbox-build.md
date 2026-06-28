@@ -70,6 +70,26 @@ WI-C (reply-draft autosave) is speced in `BRIEF-mailbox-compose-fixes.md`. jac s
 "no need to do all at once"; confirm before dispatching. The reported compose pain
 (WI-A + WI-B) is fully addressed.
 
+### WI-D + WI-E: acknowledge + status (brief `BRIEF-mailbox-ack-status.md`)
+
+jac asked to surface two more operator-seat tools. Dispatched together
+(dispatch_20260628_194419_0bab49da), reviewed + verified by the architect. Committed
+93fa1a7.
+
+- WI-D Acknowledge: DONE + VERIFIED + SHIPPED. Amber "ack" flag in the inbox (row +
+  conversation) for messages needing ack; reader shows an Acknowledge button + optional
+  response; `ack_message` via POST /api/ack; flag clears on ack. Test `tests/ack.mjs`
+  in `verify`. (ack_message works for the operator seat - no agent record needed.)
+- WI-E Status: BUILT but BLOCKED + HIDDEN. post_status rejects the operator_mailbox
+  seat with "unknown agent" (jac is an actor, not an agent; the tool is allow-listed but
+  its impl gates on the agents table). Code is fully staged: `#statusWrap` carries
+  `hidden`, `tests/status.mjs` is NOT in `verify`. Request sent to agentcomms-architect
+  (msg_20260628_195104_24637ca0): either let post_status accept a human actor on the
+  seat, or register jac as an agent. The moment it works, remove `hidden` + re-add
+  tests/status.mjs to verify - no further build.
+- Architect verification caught: the status failure (substrate, via direct post_status
+  call returning "unknown agent") - would have shipped a broken button otherwise.
+
 ## UPDATE 2026-06-28 (second engineering-architect session): both follow-ups DONE
 
 Both queued follow-ups are now BUILT and webkit-verified. The "What is built" and the
