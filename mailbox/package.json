@@ -1,0 +1,23 @@
+{
+  "name": "mailbox",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Local web mailbox over agent-comms, acting as jac.",
+  "scripts": {
+    "start": "node server.mjs",
+    "stop": "pkill -f 'node server.mjs' || true",
+    "check": "node scripts/check-connection.mjs",
+    "e2e": "node tests/e2e.mjs",
+    "e2e:autocomplete": "node tests/autocomplete.mjs",
+    "e2e:view-all": "node tests/view-all.mjs",
+    "e2e:compose-draft": "node tests/compose-draft.mjs",
+    "verify": "node tests/e2e.mjs && node tests/autocomplete.mjs && node tests/view-all.mjs && node tests/compose-draft.mjs && node scripts/cleanup-tests.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.12.0"
+  },
+  "devDependencies": {
+    "playwright": "^1.61.1"
+  }
+}
