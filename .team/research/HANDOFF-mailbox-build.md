@@ -3,6 +3,50 @@
 Date: 2026-06-28. Author: engineering-architect session. Supersedes the pre-build
 HANDOFF-mailbox.md for everything below.
 
+## RESUME HERE (2026-07-01, for the next engineering-architect session)
+
+You are engineering-architect on team "engineering", project `/Users/home/dev/gh-public/_skills`.
+jac handed off to restart on the new Fable model. The mailbox app is in good shape;
+everything is COMMITTED and CLEAN. Read this block, then the rest is detail/history.
+
+STATE: master HEAD = 5d969a2. All mailbox work committed (66a6f2f app + compose fixes,
+93fa1a7 ack + hidden status, 5d969a2 docs). No server running. Inbox clean (no test
+cruft). Worktree `_skills-operator-console/mailbox` == master. Nothing uncommitted in
+mailbox/ or its docs. (The repo has other PRE-EXISTING unrelated modified/untracked
+files - CLAUDE.md, LICENSE, README, other skills, duet/, PHASE2-build-brief-mailbox.md.
+Those are NOT this work; leave them alone unless jac asks.)
+
+SHIPPED + VERIFIED: read/reply/compose, inbox grouped by sender, recipient autocomplete
+(chip input, per-recipient validation), View all from a sender, inline compose pane
+with draft autosave, Acknowledge (amber ack flag + button). `cd mailbox && npm start`
+then `npm run verify` (webkit) is green.
+
+TWO OPEN ITEMS (both parked per jac; do NOT chase unless asked):
+1. STATUS (post_status) - BUILT but HIDDEN + BLOCKED. The operator_mailbox seat rejects
+   post_status: "unknown agent" (jac is an actor, not an agent). Requested fix from
+   agentcomms-architect (msg_20260628_195104_24637ca0) - AWAITING REPLY. When it lands:
+   remove `hidden` from `#statusWrap` in mailbox/public/index.html, re-add
+   `node tests/status.mjs` to the `verify` script in mailbox/package.json, run
+   `npm run verify`, screenshot for jac, commit. No other build needed.
+2. Worker re-point (msg_20260628_114420_8061f357) - AWAITING REPLY. Not urgent; the
+   worktree-staging workflow (below) unblocks dispatch regardless.
+
+ALSO OPTIONAL, NOT BUILT: WI-C reply-draft autosave (speced in
+BRIEF-mailbox-compose-fixes.md). Confirm with jac before building.
+
+DISPATCH WORKFLOW (critical - the worker cannot self-verify):
+- engineering-codex-worker's project_root is the worktree `_skills-operator-console`,
+  where mailbox/ does NOT live in git (uncommitted history). Before dispatch:
+  `rm -rf _skills-operator-console/mailbox && cp -R _skills/mailbox _skills-operator-console/mailbox`.
+- Dispatch with the full brief INLINED (the worker cannot see uncommitted .team briefs).
+- The worker's sandbox CANNOT bind 127.0.0.1:4100 or launch webkit, so it ships CODE
+  ONLY and cannot run `npm run verify`. YOU (architect) MUST review the diff and run the
+  full suite locally to gate. This session caught two bugs the worker could not: a
+  cleanup-regex gap, a `${JAC}`-in-waitForFunction ReferenceError, and the post_status
+  substrate block. Always verify locally.
+- After review + local verify: sync worktree->master (cp the changed files), run
+  `npm run verify` on master, then commit. master is canonical.
+
 ## OPERATOR FEEDBACK BACKLOG (2026-06-28, from jac)
 
 Reported after using Compose. Priority order. Brief: `BRIEF-mailbox-compose-fixes.md`.
