@@ -34,7 +34,13 @@ follow-up, parent msg_20260628_195104_24637ca0).
    registering jac as an agent). Our side fully built + hidden (see
    HANDOFF-mailbox-build.md item 1): unhide #statusWrap, re-add tests/status.mjs to
    verify, run, screenshot, commit.
-3. list_status (read-only) on the seat -> passive status board. Rides along if cheap.
+3. list_status (read-only) on the seat -> passive status board. UI PRE-BUILT
+   2026-07-01 (inert; brief BRIEF-mailbox-status-board.md, dispatch
+   dispatch_20260701_233819_7b2cdb9e, verified + committed). Board button is
+   hidden until /api/status-board reports boardAvailable:true. When the grant
+   lands: restart, button appears, screenshot for jac. If the tool name is not
+   `list_status`, re-point mail.mjs listStatus() only. Enabled path covered in
+   `verify` via route-interception (tests/status-board.mjs).
 
 ### L2 - Workflow (mostly ours, after L1)
 

@@ -7,6 +7,7 @@ import { dirname, join, normalize, extname } from "node:path";
 import {
   listInbox,
   listSent,
+  listStatus,
   readMessage,
   sendMessage,
   listActors,
@@ -99,6 +100,17 @@ const server = createServer(async (req, res) => {
         });
       } catch {
         return sendJson(res, 200, { messages: [], sentAvailable: false });
+      }
+    }
+    if (path === "/api/status-board" && req.method === "GET") {
+      try {
+        const rows = await listStatus();
+        return sendJson(res, 200, {
+          statuses: Array.isArray(rows) ? rows : [],
+          boardAvailable: true,
+        });
+      } catch {
+        return sendJson(res, 200, { statuses: [], boardAvailable: false });
       }
     }
     if (path === "/api/message" && req.method === "GET") {

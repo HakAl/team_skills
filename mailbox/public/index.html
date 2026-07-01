@@ -30,6 +30,7 @@
           </div>
         </form>
       </div>
+      <button class="btn ghost" id="statusBoardBtn" type="button" hidden>Status board</button>
       <button class="btn primary" id="composeBtn">Compose</button>
     </header>
 
@@ -46,6 +47,11 @@
       <section class="pane reading" id="readingPane" aria-label="Reading">
         <button class="btn ghost back" id="backBtn" hidden>&larr; Inbox</button>
         <div class="placeholder" id="placeholder">Select a message to read.</div>
+
+        <section class="status-board" id="statusBoard" hidden>
+          <h2>Status board</h2>
+          <div class="status-board-list" id="statusBoardList"></div>
+        </section>
 
         <article class="reader" id="reader" hidden>
           <h2 class="subject" id="rSubject"></h2>

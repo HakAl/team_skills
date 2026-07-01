@@ -172,6 +172,60 @@ body {
   padding: 10px;
 }
 
+.status-board {
+  padding: 18px 22px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.status-board h2 { margin: 0; font-size: 18px; }
+.status-board-list { display: flex; flex-direction: column; gap: 10px; }
+.status-board-empty { color: var(--muted); }
+.status-card {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+}
+.status-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.status-age { color: var(--muted); font-size: 12px; white-space: nowrap; }
+.status-age.stale { color: #fbbf24; }
+.status-blocked {
+  color: #fbbf24;
+  background: rgba(245,158,11,0.12);
+  border-left: 3px solid #f59e0b;
+  padding: 6px 8px;
+  margin: 6px 0;
+}
+.status-next { color: var(--muted); margin: 6px 0; }
+.status-next span { font-weight: 600; }
+.status-summary {
+  white-space: pre-wrap;
+  word-break: break-word;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+}
+.status-summary.expanded {
+  display: block;
+  -webkit-line-clamp: unset;
+}
+.status-more {
+  border: 0;
+  background: transparent;
+  color: var(--accent);
+  cursor: pointer;
+  padding: 8px 0 0;
+  font: inherit;
+}
+
 .thread { border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
 .thread summary { cursor: pointer; padding: 10px 12px; color: var(--muted); }
 .thread .t-msg { border-top: 1px solid var(--line); padding: 10px 12px; }

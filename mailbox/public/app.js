@@ -128,6 +128,8 @@ function renderInbox(messages) {
 let inboxMessages = [];
 let sentMessages = [];
 let sentAvailable = false;
+let boardStatuses = [];
+let boardAvailable = false;
 
 async function loadInbox() {
   try {
@@ -151,6 +153,134 @@ async function loadSent() {
     sentAvailable = false;
   }
   if (viewAllSender) setupSenderAll(viewAllSender);
+}
+
+async function loadStatusBoard() {
+  try {
+    const { statuses, boardAvailable: avail } = await api("/api/status-board");
+    boardStatuses = Array.isArray(statuses) ? statuses : [];
+    boardAvailable = !!avail;
+  } catch {
+    boardStatuses = [];
+    boardAvailable = false;
+  }
+  $("statusBoardBtn").hidden = !boardAvailable;
+  if (!$("statusBoard").hidden) renderStatusBoard();
+}
+
+function fmtAge(iso) {
+  if (!iso) return "";
+  const t = new Date(iso).getTime();
+  if (Number.isNaN(t)) return iso;
+  const ms = Math.max(0, Date.now() - t);
+  const hour = 60 * 60 * 1000;
+  const day = 24 * hour;
+  const week = 7 * day;
+  if (ms < day) return `${Math.max(1, Math.floor(ms / hour))}h ago`;
+  if (ms < week) return `${Math.floor(ms / day)}d ago`;
+  return `${Math.floor(ms / week)}w ago`;
+}
+
+function isStale(iso) {
+  const t = new Date(iso).getTime();
+  return !Number.isNaN(t) && Date.now() - t > 7 * 24 * 60 * 60 * 1000;
+}
+
+function statusTime(status) {
+  const t = new Date(status && status.created_at).getTime();
+  return Number.isNaN(t) ? 0 : t;
+}
+
+function hasBlocked(status) {
+  return !!String(status && status.blocked_on || "").trim();
+}
+
+function renderStatusBoard() {
+  const list = $("statusBoardList");
+  list.innerHTML = "";
+  if (!boardStatuses.length) {
+    const empty = document.createElement("div");
+    empty.className = "status-board-empty";
+    empty.textContent = "No statuses.";
+    list.appendChild(empty);
+    return;
+  }
+
+  const ordered = [...boardStatuses].sort((a, b) => {
+    const blockedDelta = Number(hasBlocked(b)) - Number(hasBlocked(a));
+    if (blockedDelta) return blockedDelta;
+    return statusTime(b) - statusTime(a);
+  });
+
+  for (const status of ordered) {
+    const card = document.createElement("article");
+    card.className = "status-card";
+    card.dataset.agentId = status.agent_id || "";
+
+    const head = document.createElement("div");
+    head.className = "status-card-head";
+    const agent = document.createElement("strong");
+    agent.textContent = senderLabel(status.agent_id || status.id || "");
+    const age = document.createElement("span");
+    age.className = "status-age";
+    if (isStale(status.created_at)) age.classList.add("stale");
+    age.textContent = fmtAge(status.created_at);
+    head.append(agent, age);
+    card.appendChild(head);
+
+    const blocked = String(status.blocked_on || "").trim();
+    if (blocked) {
+      const blockedLine = document.createElement("div");
+      blockedLine.className = "status-blocked";
+      const prefix = document.createElement("strong");
+      prefix.textContent = "BLOCKED:";
+      blockedLine.append(prefix, document.createTextNode(" " + blocked));
+      card.appendChild(blockedLine);
+    }
+
+    const next = String(status.next_step || "").trim();
+    if (next) {
+      const nextLine = document.createElement("div");
+      nextLine.className = "status-next";
+      const prefix = document.createElement("span");
+      prefix.textContent = "next:";
+      nextLine.append(prefix, document.createTextNode(" " + next));
+      card.appendChild(nextLine);
+    }
+
+    const summary = document.createElement("div");
+    summary.className = "status-summary";
+    summary.textContent = esc(status.summary || "");
+    card.appendChild(summary);
+
+    if (String(status.summary || "").length > 240) {
+      const toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className = "status-more";
+      toggle.textContent = "more";
+      toggle.addEventListener("click", () => {
+        const expanded = summary.classList.toggle("expanded");
+        toggle.textContent = expanded ? "less" : "more";
+      });
+      card.appendChild(toggle);
+    }
+
+    list.appendChild(card);
+  }
+}
+
+async function openStatusBoard() {
+  layout.classList.add("reading-open");
+  $("backBtn").hidden = false;
+  $("placeholder").hidden = true;
+  $("reader").hidden = true;
+  $("composeForm").hidden = true;
+  $("statusBoard").hidden = false;
+  await loadStatusBoard();
+}
+
+function hideStatusBoard() {
+  $("statusBoard").hidden = true;
 }
 
 function renderThread(thread) {
@@ -307,6 +437,7 @@ async function openMessage(id) {
   $("backBtn").hidden = false;
   $("placeholder").hidden = true;
   $("composeForm").hidden = true;
+  hideStatusBoard();
   $("reader").hidden = false;
   try {
     const { message, thread } = await api("/api/message?id=" + encodeURIComponent(id));
@@ -393,6 +524,7 @@ function openCompose() {
   $("backBtn").hidden = false;
   $("placeholder").hidden = true;
   $("reader").hidden = true;
+  hideStatusBoard();
   $("composeForm").hidden = false;
   restoreDraft();
   $("cTo").focus();
@@ -660,6 +792,7 @@ $("composeDiscard").addEventListener("click", discardDraft);
 $("composeForm").addEventListener("submit", sendCompose);
 $("replyForm").addEventListener("submit", sendReply);
 $("refreshBtn").addEventListener("click", loadInbox);
+$("statusBoardBtn").addEventListener("click", openStatusBoard);
 $("viewAllBtn").addEventListener("click", toggleSenderAll);
 $("ackBtn").addEventListener("click", acknowledgeMessage);
 $("statusBtn").addEventListener("click", () => toggleStatusForm());
@@ -672,6 +805,7 @@ $("backBtn").addEventListener("click", () => {
 loadMe();
 loadActors();
 loadSent();
+loadStatusBoard();
 restoreDraft();
 restoreStatus();
 loadInbox();
