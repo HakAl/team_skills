@@ -23,8 +23,13 @@ Consolidated ask sent: msg_20260701_220730_8a98d5fc (also nudges the post_status
 follow-up, parent msg_20260628_195104_24637ca0).
 
 1. Sent-items (read-only): messages WHERE from_agent = jac. Unlocks two-sided
-   threads in the reader. UI to build once granted: render jac's replies inline in
-   the conversation/View-all path.
+   threads in the reader. UI PRE-BUILT 2026-07-01 (inert, rosterAvailable-style
+   degradation; brief BRIEF-mailbox-sent-items.md, dispatch
+   dispatch_20260701_221857_7715297d, verified + committed). When the grant lands:
+   restart the server, confirm /api/sent returns sentAvailable:true, eyeball a
+   two-sided View-all, screenshot for jac. If the tool name is not `list_sent`,
+   re-point mail.mjs listSent() only. The enabled render path is already covered
+   in `verify` via route-interception (tests/sent-merge.mjs).
 2. post_status fix: recommend accepting a human actor on the operator seat (NOT
    registering jac as an agent). Our side fully built + hidden (see
    HANDOFF-mailbox-build.md item 1): unhide #statusWrap, re-add tests/status.mjs to

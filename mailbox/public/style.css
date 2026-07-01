@@ -193,6 +193,10 @@ body {
 .sa-item.clickable:hover { background: var(--line); }
 .sa-item.current { background: var(--line); }
 .sa-item.unread .t-meta { color: var(--text); font-weight: 600; }
+.sa-item.from-you {
+  border-left: 3px solid var(--accent);
+  background: rgba(76, 141, 255, 0.08);
+}
 
 .reply { display: flex; flex-direction: column; gap: 8px; }
 .reply label { color: var(--muted); }

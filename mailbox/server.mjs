@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { dirname, join, normalize, extname } from "node:path";
 import {
   listInbox,
+  listSent,
   readMessage,
   sendMessage,
   listActors,
@@ -88,6 +89,17 @@ const server = createServer(async (req, res) => {
     if (path === "/api/inbox" && req.method === "GET") {
       const rows = await listInbox({ unreadOnly: false, limit: 50 });
       return sendJson(res, 200, { messages: Array.isArray(rows) ? rows : [] });
+    }
+    if (path === "/api/sent" && req.method === "GET") {
+      try {
+        const rows = await listSent({ limit: 100 });
+        return sendJson(res, 200, {
+          messages: Array.isArray(rows) ? rows : [],
+          sentAvailable: true,
+        });
+      } catch {
+        return sendJson(res, 200, { messages: [], sentAvailable: false });
+      }
     }
     if (path === "/api/message" && req.method === "GET") {
       const id = url.searchParams.get("id");

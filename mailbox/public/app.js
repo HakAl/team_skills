@@ -126,6 +126,8 @@ function renderInbox(messages) {
 // without a refetch. The operator seat only returns messages addressed TO jac,
 // so this is the sender's messages to you, not a two-sided thread.
 let inboxMessages = [];
+let sentMessages = [];
+let sentAvailable = false;
 
 async function loadInbox() {
   try {
@@ -137,6 +139,18 @@ async function loadInbox() {
   } catch (e) {
     toast("Inbox failed: " + e.message, true);
   }
+}
+
+async function loadSent() {
+  try {
+    const { messages, sentAvailable: avail } = await api("/api/sent");
+    sentMessages = Array.isArray(messages) ? messages : [];
+    sentAvailable = !!avail;
+  } catch {
+    sentMessages = [];
+    sentAvailable = false;
+  }
+  if (viewAllSender) setupSenderAll(viewAllSender);
 }
 
 function renderThread(thread) {
@@ -166,6 +180,18 @@ function renderThread(thread) {
 // messages to you only - not your replies back (no two-sided transcript).
 let viewAllSender = null;
 
+function sentToSender(m, sender) {
+  const to = m && m.to;
+  return Array.isArray(to) ? to.includes(sender) : to === sender;
+}
+
+function senderAllCount(sender) {
+  const inboxCount = inboxMessages.filter((m) => m.from === sender).length;
+  if (!sentAvailable) return inboxCount;
+  const sentCount = sentMessages.filter((m) => sentToSender(m, sender)).length;
+  return inboxCount + sentCount;
+}
+
 function setupSenderAll(sender) {
   viewAllSender = sender;
   const wrap = $("senderAll");
@@ -173,7 +199,7 @@ function setupSenderAll(sender) {
   const btn = $("viewAllBtn");
   list.hidden = true;
   list.innerHTML = "";
-  const count = inboxMessages.filter((m) => m.from === sender).length;
+  const count = senderAllCount(sender);
   // Only worth a button when there is more than the message you are already reading.
   if (count <= 1) { wrap.hidden = true; return; }
   wrap.hidden = false;
@@ -183,34 +209,74 @@ function setupSenderAll(sender) {
 function renderSenderAll() {
   const list = $("senderAllList");
   list.innerHTML = "";
-  const msgs = inboxMessages
+  const inboxMsgs = inboxMessages
     .filter((m) => m.from === viewAllSender)
+    .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+
+  if (!sentAvailable) {
+    const cap = document.createElement("div");
+    cap.className = "sender-all-cap";
+    cap.textContent =
+      `${inboxMsgs.length} message(s) from ${senderLabel(viewAllSender)} to you` +
+      ` - your replies are not shown (the seat has no sent-items view).`;
+    list.appendChild(cap);
+
+    for (const m of inboxMsgs) {
+      const item = document.createElement("div");
+      item.className = "t-msg sa-item" +
+        (m.id === selectedId ? " current" : "") +
+        (m.status === "sent" ? " unread" : "");
+      const meta = document.createElement("div");
+      meta.className = "t-meta";
+      meta.textContent =
+        `${m.status === "sent" ? "* " : ""}${esc(m.subject) || "(no subject)"}` +
+        ` - ${fmtWhen(m.created_at)}` +
+        (m.id === selectedId ? " - (open)" : "");
+      const body = document.createElement("div");
+      body.className = "t-body";
+      body.textContent = esc(m.body_snippet || "");
+      item.append(meta, body);
+      // Click any sibling to open it fully in the reader (marks just that one read).
+      if (m.id !== selectedId) {
+        item.classList.add("clickable");
+        item.addEventListener("click", () => openMessage(m.id));
+      }
+      list.appendChild(item);
+    }
+    return;
+  }
+
+  const sentMsgs = sentMessages
+    .filter((m) => sentToSender(m, viewAllSender))
+    .map((m) => ({ ...m, _fromYou: true }));
+  const msgs = [...inboxMsgs, ...sentMsgs]
     .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
   const cap = document.createElement("div");
   cap.className = "sender-all-cap";
-  cap.textContent =
-    `${msgs.length} message(s) from ${senderLabel(viewAllSender)} to you` +
-    ` - your replies are not shown (the seat has no sent-items view).`;
+  cap.textContent = `${msgs.length} message(s) between you and ${senderLabel(viewAllSender)}`;
   list.appendChild(cap);
 
   for (const m of msgs) {
     const item = document.createElement("div");
-    item.className = "t-msg sa-item" +
-      (m.id === selectedId ? " current" : "") +
-      (m.status === "sent" ? " unread" : "");
+    item.className = m._fromYou
+      ? "t-msg sa-item from-you"
+      : "t-msg sa-item" +
+        (m.id === selectedId ? " current" : "") +
+        (m.status === "sent" ? " unread" : "");
     const meta = document.createElement("div");
     meta.className = "t-meta";
-    meta.textContent =
-      `${m.status === "sent" ? "* " : ""}${esc(m.subject) || "(no subject)"}` +
-      ` - ${fmtWhen(m.created_at)}` +
-      (m.id === selectedId ? " - (open)" : "");
+    meta.textContent = m._fromYou
+      ? `${myDisplay} (you) - ${esc(m.subject) || "(no subject)"} - ${fmtWhen(m.created_at)}`
+      : `${m.status === "sent" ? "* " : ""}${esc(m.subject) || "(no subject)"}` +
+        ` - ${fmtWhen(m.created_at)}` +
+        (m.id === selectedId ? " - (open)" : "");
     const body = document.createElement("div");
     body.className = "t-body";
     body.textContent = esc(m.body_snippet || "");
     item.append(meta, body);
     // Click any sibling to open it fully in the reader (marks just that one read).
-    if (m.id !== selectedId) {
+    if (!m._fromYou && m.id !== selectedId) {
       item.classList.add("clickable");
       item.addEventListener("click", () => openMessage(m.id));
     }
@@ -218,16 +284,19 @@ function renderSenderAll() {
   }
 }
 
-function toggleSenderAll() {
+async function toggleSenderAll() {
   const list = $("senderAllList");
   const btn = $("viewAllBtn");
   if (list.hidden) {
+    await loadSent();
+    setupSenderAll(viewAllSender);
+    if ($("senderAll").hidden) return;
     renderSenderAll();
     list.hidden = false;
     btn.textContent = `Hide messages from ${senderLabel(viewAllSender)}`;
   } else {
     list.hidden = true;
-    const count = inboxMessages.filter((m) => m.from === viewAllSender).length;
+    const count = senderAllCount(viewAllSender);
     btn.textContent = `View all from ${senderLabel(viewAllSender)} (${count})`;
   }
 }
@@ -602,6 +671,7 @@ $("backBtn").addEventListener("click", () => {
 
 loadMe();
 loadActors();
+loadSent();
 restoreDraft();
 restoreStatus();
 loadInbox();

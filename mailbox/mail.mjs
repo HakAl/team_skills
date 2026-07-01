@@ -75,6 +75,10 @@ export function listInbox({ unreadOnly = false, includeClosed = false, limit = 5
   });
 }
 
+export function listSent({ limit = 100 } = {}) {
+  return call("list_sent", { limit });
+}
+
 export function readMessage(messageId) {
   return call("read_message", { message_id: messageId });
 }
