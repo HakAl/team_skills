@@ -3,36 +3,51 @@
 Date: 2026-06-28. Author: engineering-architect session. Supersedes the pre-build
 HANDOFF-mailbox.md for everything below.
 
-## RESUME HERE (2026-07-01, for the next engineering-architect session)
+## RESUME HERE (2026-07-01 end of second Fable session, for the next engineering-architect session)
 
 You are engineering-architect on team "engineering", project `/Users/home/dev/gh-public/_skills`.
-jac handed off to restart on the new Fable model. The mailbox app is in good shape;
-everything is COMMITTED and CLEAN. Read this block, then the rest is detail/history.
+Everything is COMMITTED, VERIFIED, and CLEAN. Direction doc: read
+`.team/research/ROADMAP-mailbox-ledger.md` FIRST (jac's "complete ledger" vision,
+agreed 2026-07-01; phases L1/L2/L3). Then this block; the rest is detail/history.
 
-STATE: master HEAD = 5d969a2. All mailbox work committed (66a6f2f app + compose fixes,
-93fa1a7 ack + hidden status, 5d969a2 docs). No server running. Inbox clean (no test
-cruft). Worktree `_skills-operator-console/mailbox` == master. Nothing uncommitted in
-mailbox/ or its docs. (The repo has other PRE-EXISTING unrelated modified/untracked
-files - CLAUDE.md, LICENSE, README, other skills, duet/, PHASE2-build-brief-mailbox.md.
-Those are NOT this work; leave them alone unless jac asks.)
+STATE: master HEAD = 37aaa8d (b0f2eac roadmap, 8e7cdce sent-items pre-build,
+37aaa8d status board pre-build, + this handoff commit on top). No server running.
+Inbox clean of test cruft. Worktree `_skills-operator-console/mailbox` == master
+(except the regenerated tests/e2e-result.png artifact). (The repo has other
+PRE-EXISTING unrelated modified/untracked files - CLAUDE.md, LICENSE, README, other
+skills, duet/, etc. NOT this work; leave alone unless jac asks.)
 
-SHIPPED + VERIFIED: read/reply/compose, inbox grouped by sender, recipient autocomplete
-(chip input, per-recipient validation), View all from a sender, inline compose pane
-with draft autosave, Acknowledge (amber ack flag + button). `cd mailbox && npm start`
-then `npm run verify` (webkit) is green.
+SHIPPED + VERIFIED (webkit, `cd mailbox && npm start` then `npm run verify`):
+read/reply/compose, sender-grouped inbox, chip autocomplete, View all, draft
+autosave, Acknowledge - plus, NEW this session, THREE PRE-BUILT/INERT features all
+waiting on ONE agentcomms-architect reply (consolidated ask
+msg_20260701_220730_8a98d5fc, threaded on the old post_status ask):
+1. SENT-ITEMS / two-sided View-all (8e7cdce): lights up when the seat grants a
+   sent-items tool; /api/sent reports sentAvailable. Speculative name `list_sent`
+   isolated in mail.mjs listSent().
+2. STATUS BOARD read-only (37aaa8d): header button hidden until /api/status-board
+   reports boardAvailable; blocked-first ordering, stale ages, clamped summaries.
+   Speculative name `list_status` isolated in mail.mjs listStatus().
+3. POST STATUS write (93fa1a7, older): #statusWrap still `hidden`, tests/status.mjs
+   still out of `verify`; unhide + re-add when the seat accepts jac.
+ALL THREE enabled paths are ALREADY tested in `verify` via Playwright
+route-interception (tests/sent-merge.mjs, tests/status-board.mjs), so each grant is:
+restart server -> confirm the availability flag flips -> eyeball -> SCREENSHOT FOR
+JAC -> done (re-point the mail.mjs wrapper if they chose different tool names).
 
-TWO OPEN ITEMS (both parked per jac; do NOT chase unless asked):
-1. STATUS (post_status) - BUILT but HIDDEN + BLOCKED. The operator_mailbox seat rejects
-   post_status: "unknown agent" (jac is an actor, not an agent). Requested fix from
-   agentcomms-architect (msg_20260628_195104_24637ca0) - AWAITING REPLY. When it lands:
-   remove `hidden` from `#statusWrap` in mailbox/public/index.html, re-add
-   `node tests/status.mjs` to the `verify` script in mailbox/package.json, run
-   `npm run verify`, screenshot for jac, commit. No other build needed.
-2. Worker re-point (msg_20260628_114420_8061f357) - AWAITING REPLY. Not urgent; the
-   worktree-staging workflow (below) unblocks dispatch regardless.
+WHEN THE AGENTCOMMS REPLY LANDS, that unhide/verify/screenshot pass is the top
+priority. If they are silent and jac asks for more: L2 of the roadmap (ack-as-
+approval + request-work conventions) or parked WI-C (reply-draft autosave,
+BRIEF-mailbox-compose-fixes.md) - confirm with jac first either way.
 
-ALSO OPTIONAL, NOT BUILT: WI-C reply-draft autosave (speced in
-BRIEF-mailbox-compose-fixes.md). Confirm with jac before building.
+ALSO PARKED: worker re-point (msg_20260628_114420_8061f357) - AWAITING REPLY, not
+urgent; worktree staging covers dispatch.
+
+SESSION NOTES: 2 dispatches to engineering-codex-worker this session. Sent-items:
+worker's ordering assertion parsed fmtWhen locale dates + "(open)" suffix ->
+Date.parse NaN; architect fixed before merge (the local-verify gate keeps earning
+its keep). Status board: clean first pass. jac now messages us THROUGH the mailbox
+(reply in the mailbox, close when handled - that IS the ledger being built).
 
 DISPATCH WORKFLOW (critical - the worker cannot self-verify):
 - engineering-codex-worker's project_root is the worktree `_skills-operator-console`,
