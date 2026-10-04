@@ -208,6 +208,15 @@ const server = createServer(async (req, res) => {
   }
 });
 
+server.on("error", (err) => {
+  if (err && err.code === "EADDRINUSE") {
+    console.error(`mailbox: ${HOST}:${PORT} is already in use. Another mailbox is probably running;`);
+    console.error(`stop it with \`npm run stop\` or start this one with MAILBOX_PORT=<port> npm start.`);
+    process.exit(1);
+  }
+  throw err;
+});
+
 server.listen(PORT, HOST, () => {
   console.log(`mailbox (as ${ACTOR_DISPLAY}) at http://${HOST}:${PORT}`);
   console.log("Press Ctrl+C to stop.");
