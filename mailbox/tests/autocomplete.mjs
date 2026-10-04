@@ -52,6 +52,15 @@ try {
   , JAC);
   ok(true, "second recipient validates independently as .chip-valid");
 
+  console.log("4. a space commits the token, same as comma and Enter");
+  await page.type("#cTo", "space-delimited-actor ");
+  await page.waitForFunction(() =>
+    document.querySelector('.chip[data-id="space-delimited-actor"]') !== null
+  );
+  const leftover = await page.inputValue("#cTo");
+  ok(leftover === "", "input is empty after the space commits the chip");
+  await page.click("#composeDiscard");
+
   console.log(failures ? `\nFAIL - ${failures} check(s) failed` : "\nPASS - autocomplete hard-validation verified in webkit");
 } catch (e) {
   console.error("ERROR:", e.message);

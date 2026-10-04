@@ -87,11 +87,14 @@ export function readMessage(messageId) {
   return call("read_message", { message_id: messageId });
 }
 
-export function sendMessage({ toAgents, subject, body, refs, parentMessageId, requiresAck } = {}) {
+export const PRIORITIES = ["normal", "high", "blocker", "low"];
+
+export function sendMessage({ toAgents, subject, body, refs, parentMessageId, requiresAck, priority } = {}) {
   const args = { to_agents: toAgents, subject, body };
   if (refs && refs.length) args.refs = refs;
   if (parentMessageId) args.parent_message_id = parentMessageId;
   if (requiresAck !== undefined) args.requires_ack = !!requiresAck;
+  if (priority && PRIORITIES.includes(priority) && priority !== "normal") args.priority = priority;
   return call("send_message", args);
 }
 
@@ -99,7 +102,7 @@ export function listActors() {
   return call("list_actors", {});
 }
 
-// Triage (full UI for this is NEXT). Exposed now for the test-cleanup script.
+// Triage: close removes a message from the inbox (list_inbox hides closed rows).
 export function closeMessage(messageId, response = "") {
   return call("close_message", { message_id: messageId, response });
 }

@@ -37,11 +37,17 @@
     <main class="layout" id="layout">
       <section class="pane list" id="listPane" aria-label="Inbox">
         <div class="pane-head">
-          <span>Inbox</span>
+          <span class="pane-title">Inbox <span class="unread-total" id="unreadTotal" title="unread messages" hidden></span></span>
           <button class="btn ghost" id="refreshBtn" title="reload inbox">Refresh</button>
+        </div>
+        <div class="filter-bar" id="filters" role="group" aria-label="Filter inbox">
+          <button class="filter active" type="button" data-filter="all">All</button>
+          <button class="filter" type="button" data-filter="unread">Unread</button>
+          <button class="filter" type="button" data-filter="ack">Needs ack</button>
         </div>
         <ul class="messages" id="messages"></ul>
         <div class="empty" id="listEmpty" hidden>No messages.</div>
+        <div class="list-note" id="listNote" hidden></div>
       </section>
 
       <section class="pane reading" id="readingPane" aria-label="Reading">
@@ -57,7 +63,11 @@
           <h2 class="subject" id="rSubject"></h2>
           <div class="meta">
             <span id="rFrom"></span>
+            <span id="rTo" class="muted-wrap"></span>
             <span id="rWhen"></span>
+            <span class="priority-badge" id="rPriority" hidden></span>
+            <button class="btn ghost small" type="button" id="closeMsgBtn"
+              title="Remove this message from the inbox (close_message). Does not delete it.">Close message</button>
           </div>
           <div class="body" id="rBody"></div>
 
@@ -78,9 +88,20 @@
 
           <form class="reply" id="replyForm">
             <label for="replyBody">Reply</label>
+            <div class="reply-to">
+              <span id="replyTo"></span>
+              <label class="check" id="replyAllWrap" hidden>
+                <input type="checkbox" id="rReplyAll" />
+                <span id="replyAllLabel">Reply all</span>
+              </label>
+            </div>
             <textarea id="replyBody" rows="3" placeholder="Write a reply..."></textarea>
             <div class="reply-actions">
               <span class="sending-as">sending as jac</span>
+              <button class="btn ghost" type="button" id="quoteBtn" title="Insert the message you are replying to, quoted">Quote</button>
+              <label class="check" title="Ask the recipient to acknowledge this reply">
+                <input type="checkbox" id="rAck" /> Request ack
+              </label>
               <button class="btn primary" type="submit" id="replySend">Send</button>
             </div>
           </form>
@@ -91,13 +112,25 @@
           <label for="cTo">To</label>
           <div class="recipient-input" id="recipientInput">
             <div class="recipient-chips" id="recipientChips"></div>
-            <input id="cTo" list="actorList" placeholder="actor id" autocomplete="off" />
+            <input id="cTo" list="actorList" placeholder="actor id (space, comma or Enter adds it)" autocomplete="off" />
           </div>
           <datalist id="actorList"></datalist>
           <label for="cSubject">Subject</label>
           <input id="cSubject" placeholder="Subject" />
           <label for="cBody">Body</label>
           <textarea id="cBody" rows="8" placeholder="Write your message..."></textarea>
+          <div class="compose-options">
+            <label class="check" title="Ask every recipient to acknowledge this message">
+              <input type="checkbox" id="cAck" /> Request ack
+            </label>
+            <label class="check">Priority
+              <select id="cPriority">
+                <option value="normal">normal</option>
+                <option value="high">high</option>
+                <option value="blocker">blocker</option>
+              </select>
+            </label>
+          </div>
           <div class="compose-actions">
             <span class="sending-as">sending as jac</span>
             <span class="draft-status" id="draftStatus" aria-live="polite"></span>

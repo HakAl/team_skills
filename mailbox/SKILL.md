@@ -51,6 +51,30 @@ Node backend + plain HTML/JS, no bundler. Webkit for e2e (chrome is not installe
     an amber "ack" flag in the inbox (row + conversation); opening one shows an
     Acknowledge button with an optional response, backed by `ack_message` via
     `POST /api/ack`. Acking clears the flag.
+  - Request ack - compose and reply both have a "Request ack" checkbox that sets
+    `requires_ack` on the outgoing message. Compose also has a Priority select
+    (normal / high / blocker). Both persist in the compose draft.
+  - Priority - non-normal priority renders as a badge (HIGH amber, BLOCKER red) in the
+    inbox row, the conversation head (highest in the group), and the reader meta line.
+  - Filters + unread total - a filter bar under the inbox head (All / Unread / Needs
+    ack) filters client-side over the loaded page. The inbox head shows the total
+    unread count and the document title carries it as "(N) Mailbox - jac". The server
+    page is 200 messages; when the page is full a note under the list says so.
+  - Close - "Close message" in the reader meta line calls `close_message` via
+    `POST /api/close` (empty response: the substrate requires a threaded reply for
+    close text); the message leaves the inbox and the reader clears. Each expanded
+    conversation offers "Close N read" to bulk-close its already-read messages after
+    a confirm dialog. Closed is not deleted (`include_closed` still lists them).
+  - Reply context - the reply form shows "To: <sender>"; when the message had other
+    recipients a "Reply all (also ...)" checkbox appears, off by default. "Quote"
+    inserts the open message prefixed with "> ". Reopening the same message keeps
+    the reply text; opening a different one clears it.
+  - Recipient tokens commit on Enter, comma, OR space (actor ids never contain
+    whitespace).
+  - Security: all message text is rendered via textContent (sender ids and subjects
+    come from other agents and are untrusted). The server refuses POSTs that are
+    not `application/json` or carry a non-loopback `Origin`, since every POST
+    sends as jac.
   - Status (`post_status`) is BUILT but HIDDEN (`#statusWrap` has `hidden`): the
     operator_mailbox seat rejects `post_status` with "unknown agent" (jac is an actor,
     not an agent). Awaiting an agent-comms fix; remove `hidden` and re-add
@@ -59,13 +83,17 @@ Node backend + plain HTML/JS, no bundler. Webkit for e2e (chrome is not installe
 - `tests/e2e.mjs` - webkit happy path (all sends self-targeted, so it never pings a
   real architect).
 - `tests/autocomplete.mjs` - webkit: roster loads, unknown recipient is blocked, valid
-  recipient passes (self-target only; never sends).
+  recipient passes, a trailing space commits a chip (self-target only; never sends).
 - `tests/view-all.mjs` - webkit: "View all" reveals a sender's messages (read-only;
   targets an already-read sender so it mutates no unread state).
 - `tests/compose-draft.mjs` - webkit: draft autosave (reload restores fields, outside
   click does not dismiss, send clears the draft, Discard clears it). Self-targeted.
 - `tests/ack.mjs` - webkit: mints a `requires_ack` self-message, verifies the inbox
   flag + Acknowledge control, acks it, verifies the flag clears. In `verify`.
+- `tests/triage.mjs` - webkit: mints a high-priority `requires_ack` self-message;
+  checks unread total + title, priority badges, the three filters, reader To line and
+  reply controls, Quote, the bulk "Close N read" tool, and closing from the reader.
+  In `verify`.
 - `tests/status.mjs` - webkit: status publish flow. NOT in `verify` (blocked: seat
   rejects `post_status`); kept for when the substrate supports it.
 - `scripts/cleanup-tests.mjs` - close the self-test messages e2e leaves behind

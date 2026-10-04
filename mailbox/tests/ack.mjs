@@ -53,8 +53,13 @@ try {
   }, { timeout: 15000 });
   assert(true, "acknowledge control disappears after ack");
 
-  const remainingFlags = await group.locator(".ack-flag").count();
-  assert(remainingFlags === 0, "needs-ack indicator clears from inbox");
+  // Scope to the acked row: the same sender may have OTHER messages still needing ack
+  // (e.g. monitor pages to jac), which legitimately keep the conversation-level flag.
+  await page.waitForFunction((s) => {
+    const row = [...document.querySelectorAll(".group-msgs .msg")].find((el) => el.textContent.includes(s));
+    return row && !row.querySelector(".ack-flag");
+  }, subject, { timeout: 15000 });
+  assert(true, "needs-ack indicator clears from the acked message row");
   console.log("\nPASS - acknowledge flow verified in webkit");
 } catch (err) {
   failed = true;

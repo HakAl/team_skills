@@ -3,6 +3,41 @@
 Date: 2026-06-28. Author: engineering-architect session. Supersedes the pre-build
 HANDOFF-mailbox.md for everything below.
 
+## RESUME HERE (2026-10-04 Fable session: inbox triage batch shipped)
+
+jac asked for "slightly better" inbox. Review agent (nifty-neo) produced a ranked list;
+jac approved items 1,2,4,5,6 (close/bulk close, priority display, filters, unread total,
+reply context) and declined 3,7 (auto-refresh, threading/refs/search/keys), plus asked
+that a SPACE commit a recipient token like comma. SHIPPED + VERIFIED (full `npm run
+verify`, 8 webkit tests + cleanup, green):
+- Close message (reader) + "Close N read" per conversation (confirm dialog), POST /api/close.
+- Priority badges (row, group head = highest in group, reader); compose Priority select.
+- Request ack checkbox on compose AND reply (plumbing existed, UI did not); in the draft.
+- Filter bar All / Unread / Needs ack; unread total in pane head + document.title;
+  INBOX_LIMIT 200 with a full-page note.
+- Reply: "To:" line, Reply all checkbox when co-recipients exist (off by default),
+  Quote button, reply text survives reopening the same message.
+- Space / comma / Enter all commit a recipient chip.
+- Security: esc() was an identity fed to innerHTML (stored XSS via subject -> send as
+  jac); all rendering is textContent now. Server refuses non-JSON POSTs and
+  non-loopback Origin. Static path check uses PUBLIC + sep.
+- New tests/triage.mjs; ack.mjs assertion scoped to the acked row (jac's self
+  conversation now holds ~70 unacked BLOCKER monitor pages sent from jac's own id, so a
+  group-wide "no ack flags" can never hold); autocomplete.mjs checks the space commit.
+
+SUBSTRATE STATE (checked 2026-10-04): sent-items for the operator seat was RATIFIED by
+agentcomms as backlog #20 (docs/dispatch/operator_mailbox_completion.md, 2026-07-13) but
+NO release through v1.0.18 implements list_sent, and no bead tracks it. jac said he may
+add the query himself ("it's just sql"). The pre-built two-sided View-all lights up the
+moment /api/sent reports sentAvailable:true (re-point mail.mjs listSent() if the tool
+name differs). Local sent-log fallback was designed by the review agent but NOT built
+(jac's call). config.mjs still launches the jac seat from the main checkout
+(/Users/home/dev/agent-comms/scripts/agent-comms-mcp, contract 25 unreleased); it works.
+
+NOT DONE / parked: auto-refresh (declined), threading/refs/search/keyboard (declined),
+dead-MCP-child recovery in mail.mjs (review finding 3), `npm run stop` pkill pattern
+(review finding 7), WI-C reply-draft autosave.
+
 ## RESUME HERE (2026-07-01 end of second Fable session, for the next engineering-architect session)
 
 You are engineering-architect on team "engineering", project `/Users/home/dev/gh-public/_skills`.

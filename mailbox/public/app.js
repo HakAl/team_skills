@@ -29,8 +29,52 @@ function fmtWhen(iso) {
   return d.toLocaleString([], { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit" });
 }
 
-function esc(s) {
+// Plain string coercion for textContent. Nothing in this file renders markup from
+// message data: subjects and sender ids come from other agents and are untrusted.
+function txt(s) {
   return String(s == null ? "" : s);
+}
+
+// --- priority ---
+const PRIORITY_RANK = { blocker: 3, high: 2, normal: 1, low: 0 };
+
+function priorityOf(m) {
+  const p = String((m && m.priority) || "normal").toLowerCase();
+  return p in PRIORITY_RANK ? p : "normal";
+}
+
+function topPriority(msgs) {
+  let best = "normal";
+  for (const m of msgs) {
+    const p = priorityOf(m);
+    if (p !== "normal" && (best === "normal" || PRIORITY_RANK[p] > PRIORITY_RANK[best])) best = p;
+  }
+  return best;
+}
+
+function priorityBadge(priority) {
+  if (!priority || priority === "normal") return null;
+  const b = document.createElement("span");
+  b.className = "priority-badge p-" + priority;
+  b.textContent = priority;
+  return b;
+}
+
+// --- inbox filter (client-side over the loaded page) ---
+let inboxFilter = "all";
+
+function matchesFilter(m) {
+  if (inboxFilter === "unread") return m.status === "sent";
+  if (inboxFilter === "ack") return needsAck(m);
+  return true;
+}
+
+function setFilter(name) {
+  inboxFilter = name;
+  for (const b of document.querySelectorAll("#filters .filter")) {
+    b.classList.toggle("active", b.dataset.filter === name);
+  }
+  renderInbox(inboxMessages);
 }
 
 // Groups stay expanded across reloads (read/send refresh the list).
@@ -56,22 +100,48 @@ function makeMsgRow(m, { showFrom } = {}) {
   dot.textContent = "*";
   const from = document.createElement("span");
   from.className = "from";
-  from.textContent = showFrom ? esc(m.from) : "";
+  from.textContent = showFrom ? txt(m.from) : "";
   const when = document.createElement("span");
   when.className = "when";
   when.textContent = fmtWhen(m.created_at);
   const subj = document.createElement("span");
   subj.className = "subj";
-  subj.textContent = esc(m.subject) || "(no subject)";
+  const pb = priorityBadge(priorityOf(m));
+  if (pb) subj.appendChild(pb);
+  subj.appendChild(document.createTextNode(txt(m.subject) || "(no subject)"));
   li.append(dot, from, when, subj);
   if (needsAck(m)) li.appendChild(ackFlag());
   li.addEventListener("click", () => openMessage(m.id));
   return li;
 }
 
-function renderInbox(messages) {
+function renderUnreadTotal(all) {
+  const n = all.filter((m) => m.status === "sent").length;
+  const el = $("unreadTotal");
+  el.hidden = n === 0;
+  el.textContent = n ? String(n) : "";
+  document.title = (n ? `(${n}) ` : "") + `Mailbox - ${myDisplay}`;
+}
+
+function renderListNote() {
+  const note = $("listNote");
+  if (inboxLimit && inboxMessages.length >= inboxLimit) {
+    note.textContent = `Showing the ${inboxLimit} most recent messages. Close handled mail to see older messages.`;
+    note.hidden = false;
+  } else {
+    note.hidden = true;
+  }
+}
+
+const EMPTY_TEXT = { all: "No messages.", unread: "No unread messages.", ack: "Nothing needs your acknowledgement." };
+
+function renderInbox(all) {
   const ul = $("messages");
   ul.innerHTML = "";
+  renderUnreadTotal(all);
+  renderListNote();
+  const messages = all.filter(matchesFilter);
+  $("listEmpty").textContent = EMPTY_TEXT[inboxFilter] || EMPTY_TEXT.all;
   $("listEmpty").hidden = messages.length > 0;
 
   // Group by sender (the operator seat only sees messages addressed to you).
@@ -97,24 +167,50 @@ function renderInbox(messages) {
 
     const head = document.createElement("div");
     head.className = "group-head";
-    head.innerHTML =
-      `<span class="caret">${expanded ? "▾" : "▸"}</span>` +
-      `<span class="from">${esc(senderLabel(sender))}</span>` +
-      (unread ? `<span class="badge">${unread}</span>` : "") +
-      `<span class="when">${fmtWhen(latest.created_at)}</span>` +
-      `<span class="count">${msgs.length}</span>` +
-      `<span class="subj">${esc(latest.subject) || "(no subject)"}</span>`;
+    const el = (cls, text) => {
+      const span = document.createElement("span");
+      span.className = cls;
+      span.textContent = text;
+      return span;
+    };
+    head.appendChild(el("caret", expanded ? "\u25be" : "\u25b8"));
+    head.appendChild(el("from", senderLabel(sender)));
+    if (unread) head.appendChild(el("badge", String(unread)));
+    head.appendChild(el("when", fmtWhen(latest.created_at)));
+    head.appendChild(el("count", String(msgs.length)));
+    const subj = el("subj", "");
+    const pb = priorityBadge(topPriority(msgs));
+    if (pb) subj.appendChild(pb);
+    subj.appendChild(document.createTextNode(txt(latest.subject) || "(no subject)"));
+    head.appendChild(subj);
     if (groupNeedsAck) head.appendChild(ackFlag());
     head.addEventListener("click", () => {
       if (expandedGroups.has(sender)) expandedGroups.delete(sender);
       else expandedGroups.add(sender);
-      renderInbox(messages);
+      renderInbox(inboxMessages);
     });
     group.appendChild(head);
 
     const sub = document.createElement("ul");
     sub.className = "group-msgs";
     sub.hidden = !expanded;
+    // Bulk triage: close every already-read message in this conversation.
+    const readMsgs = msgs.filter((m) => m.status !== "sent");
+    if (readMsgs.length) {
+      const tools = document.createElement("li");
+      tools.className = "group-tools";
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "btn ghost small close-read";
+      btn.textContent = `Close ${readMsgs.length} read`;
+      btn.title = "Remove the already-read messages in this conversation from the inbox";
+      btn.addEventListener("click", (ev) => {
+        ev.stopPropagation();
+        bulkClose(readMsgs.map((m) => m.id), senderLabel(sender));
+      });
+      tools.appendChild(btn);
+      sub.appendChild(tools);
+    }
     for (const m of msgs) sub.appendChild(makeMsgRow(m, { showFrom: false }));
     group.appendChild(sub);
 
@@ -126,6 +222,7 @@ function renderInbox(messages) {
 // without a refetch. The operator seat only returns messages addressed TO jac,
 // so this is the sender's messages to you, not a two-sided thread.
 let inboxMessages = [];
+let inboxLimit = 0;
 let sentMessages = [];
 let sentAvailable = false;
 let boardStatuses = [];
@@ -133,8 +230,9 @@ let boardAvailable = false;
 
 async function loadInbox() {
   try {
-    const { messages } = await api("/api/inbox");
+    const { messages, limit } = await api("/api/inbox");
     inboxMessages = Array.isArray(messages) ? messages : [];
+    inboxLimit = Number(limit) || 0;
     renderInbox(inboxMessages);
     // If a sender view is open, keep it in sync with the refreshed inbox.
     if (!$("senderAllList").hidden) renderSenderAll();
@@ -250,7 +348,7 @@ function renderStatusBoard() {
 
     const summary = document.createElement("div");
     summary.className = "status-summary";
-    summary.textContent = esc(status.summary || "");
+    summary.textContent = txt(status.summary || "");
     card.appendChild(summary);
 
     if (String(status.summary || "").length > 240) {
@@ -294,10 +392,10 @@ function renderThread(thread) {
     div.className = "t-msg";
     const meta = document.createElement("div");
     meta.className = "t-meta";
-    meta.textContent = `${esc(m.from)} - ${esc(m.subject)} - ${fmtWhen(m.created_at)}`;
+    meta.textContent = `${txt(m.from)} - ${txt(m.subject)} - ${fmtWhen(m.created_at)}`;
     const body = document.createElement("div");
     body.className = "t-body";
-    body.textContent = esc(m.body);
+    body.textContent = txt(m.body);
     div.append(meta, body);
     list.appendChild(div);
   }
@@ -359,12 +457,12 @@ function renderSenderAll() {
       const meta = document.createElement("div");
       meta.className = "t-meta";
       meta.textContent =
-        `${m.status === "sent" ? "* " : ""}${esc(m.subject) || "(no subject)"}` +
+        `${m.status === "sent" ? "* " : ""}${txt(m.subject) || "(no subject)"}` +
         ` - ${fmtWhen(m.created_at)}` +
         (m.id === selectedId ? " - (open)" : "");
       const body = document.createElement("div");
       body.className = "t-body";
-      body.textContent = esc(m.body_snippet || "");
+      body.textContent = txt(m.body_snippet || "");
       item.append(meta, body);
       // Click any sibling to open it fully in the reader (marks just that one read).
       if (m.id !== selectedId) {
@@ -397,13 +495,13 @@ function renderSenderAll() {
     const meta = document.createElement("div");
     meta.className = "t-meta";
     meta.textContent = m._fromYou
-      ? `${myDisplay} (you) - ${esc(m.subject) || "(no subject)"} - ${fmtWhen(m.created_at)}`
-      : `${m.status === "sent" ? "* " : ""}${esc(m.subject) || "(no subject)"}` +
+      ? `${myDisplay} (you) - ${txt(m.subject) || "(no subject)"} - ${fmtWhen(m.created_at)}`
+      : `${m.status === "sent" ? "* " : ""}${txt(m.subject) || "(no subject)"}` +
         ` - ${fmtWhen(m.created_at)}` +
         (m.id === selectedId ? " - (open)" : "");
     const body = document.createElement("div");
     body.className = "t-body";
-    body.textContent = esc(m.body_snippet || "");
+    body.textContent = txt(m.body_snippet || "");
     item.append(meta, body);
     // Click any sibling to open it fully in the reader (marks just that one read).
     if (!m._fromYou && m.id !== selectedId) {
@@ -431,7 +529,15 @@ async function toggleSenderAll() {
   }
 }
 
+let currentMessage = null;
+
+function recipientsOf(message) {
+  const to = message && message.to;
+  return (Array.isArray(to) ? to : to ? [to] : []).filter(Boolean);
+}
+
 async function openMessage(id) {
+  const changed = id !== selectedId;
   selectedId = id;
   layout.classList.add("reading-open");
   $("backBtn").hidden = false;
@@ -441,18 +547,42 @@ async function openMessage(id) {
   $("reader").hidden = false;
   try {
     const { message, thread } = await api("/api/message?id=" + encodeURIComponent(id));
-    $("rSubject").textContent = esc(message.subject) || "(no subject)";
-    $("rFrom").textContent = "From: " + esc(senderLabel(message.from));
+    currentMessage = message;
+    $("rSubject").textContent = txt(message.subject) || "(no subject)";
+    $("rFrom").textContent = "From: " + txt(senderLabel(message.from));
+    const recipients = recipientsOf(message);
+    const others = recipients.filter((r) => r !== myId);
+    $("rTo").textContent = others.length
+      ? "To: you, " + others.map(senderLabel).join(", ")
+      : "";
+    $("rTo").title = recipients.join(", ");
     $("rWhen").textContent = fmtWhen(message.created_at);
-    $("rBody").textContent = esc(message.body);
+    const pr = priorityOf(message);
+    const prEl = $("rPriority");
+    prEl.hidden = pr === "normal";
+    prEl.className = "priority-badge p-" + pr;
+    prEl.textContent = pr;
+    $("rBody").textContent = txt(message.body);
     renderAckControl(message);
     renderThread(thread);
     setupSenderAll(message.from);
-    // store reply context
-    $("replyForm").dataset.to = message.from;
-    $("replyForm").dataset.parent = message.id;
-    $("replyForm").dataset.subject = message.subject || "";
-    $("replyBody").value = "";
+    // store reply context: the reply goes to the sender; co-recipients are optional.
+    const form = $("replyForm");
+    form.dataset.to = message.from;
+    form.dataset.parent = message.id;
+    form.dataset.subject = message.subject || "";
+    const cc = others.filter((r) => r !== message.from);
+    form.dataset.cc = JSON.stringify(cc);
+    $("replyTo").textContent = "To: " + senderLabel(message.from);
+    $("replyAllWrap").hidden = cc.length === 0;
+    $("replyAllLabel").textContent = cc.length
+      ? `Reply all (also ${cc.map(senderLabel).join(", ")})`
+      : "Reply all";
+    if (changed) {
+      $("replyBody").value = "";
+      $("rReplyAll").checked = false;
+      $("rAck").checked = false;
+    }
     // reading marks it read; refresh list styling
     loadInbox();
   } catch (e) {
@@ -490,6 +620,68 @@ async function acknowledgeMessage() {
   }
 }
 
+async function closeOne(id) {
+  await api("/api/close", {
+    method: "POST",
+    headers: { "content-type": "application/json" },
+    body: JSON.stringify({ id }),
+  });
+}
+
+function clearReader() {
+  selectedId = null;
+  currentMessage = null;
+  $("reader").hidden = true;
+  $("placeholder").hidden = false;
+  layout.classList.remove("reading-open");
+}
+
+async function closeCurrentMessage() {
+  if (!selectedId) return;
+  const id = selectedId;
+  $("closeMsgBtn").disabled = true;
+  try {
+    await closeOne(id);
+    toast("Message closed");
+    clearReader();
+    await loadInbox();
+  } catch (e) {
+    toast("Close failed: " + e.message, true);
+  } finally {
+    $("closeMsgBtn").disabled = false;
+  }
+}
+
+async function bulkClose(ids, who) {
+  if (!ids.length) return;
+  if (!confirm(`Close ${ids.length} read message(s) from ${who}? They leave the inbox but are not deleted.`)) return;
+  let done = 0;
+  try {
+    for (const id of ids) {
+      await closeOne(id);
+      done++;
+      if (id === selectedId) clearReader();
+    }
+    toast(`Closed ${done} message(s)`);
+  } catch (e) {
+    toast(`Closed ${done} of ${ids.length}; then: ${e.message}`, true);
+  }
+  await loadInbox();
+}
+
+function quoteParent() {
+  if (!currentMessage) return;
+  const quoted = String(currentMessage.body || "")
+    .split("\n")
+    .map((line) => "> " + line)
+    .join("\n");
+  const ta = $("replyBody");
+  const existing = ta.value.trim();
+  ta.value = (existing ? existing + "\n\n" : "") + quoted + "\n\n";
+  ta.focus();
+  ta.setSelectionRange(ta.value.length, ta.value.length);
+}
+
 async function sendReply(ev) {
   ev.preventDefault();
   const form = $("replyForm");
@@ -497,19 +689,24 @@ async function sendReply(ev) {
   if (!body) return toast("Reply is empty", true);
   const subject = form.dataset.subject || "";
   const replySubject = subject.startsWith("Re:") ? subject : "Re: " + subject;
+  let cc = [];
+  try { cc = JSON.parse(form.dataset.cc || "[]"); } catch { cc = []; }
+  const toAgents = [form.dataset.to, ...($("rReplyAll").checked ? cc : [])].filter(Boolean);
   $("replySend").disabled = true;
   try {
     await api("/api/send", {
       method: "POST",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({
-        to: form.dataset.to,
+        toAgents,
         subject: replySubject,
         body,
         parentMessageId: form.dataset.parent,
+        requiresAck: $("rAck").checked,
       }),
     });
     $("replyBody").value = "";
+    $("rAck").checked = false;
     toast("Reply sent");
     loadInbox();
   } catch (e) {
@@ -546,6 +743,8 @@ function draftFields() {
     recipients: [...recipientIds],
     subject: $("cSubject").value,
     body: $("cBody").value,
+    requiresAck: $("cAck").checked,
+    priority: $("cPriority").value,
   };
 }
 
@@ -578,6 +777,8 @@ function restoreDraft() {
   $("cTo").value = "";
   $("cSubject").value = draft.subject || "";
   $("cBody").value = draft.body || "";
+  $("cAck").checked = draft.requiresAck === true;
+  $("cPriority").value = ["normal", "high", "blocker"].includes(draft.priority) ? draft.priority : "normal";
   $("draftStatus").textContent = "Draft saved";
   renderRecipientChips();
 }
@@ -591,6 +792,8 @@ function clearDraft({ clearFields } = {}) {
     $("cTo").value = "";
     $("cSubject").value = "";
     $("cBody").value = "";
+    $("cAck").checked = false;
+    $("cPriority").value = "normal";
     renderRecipientChips();
   }
 }
@@ -615,7 +818,13 @@ async function sendCompose(ev) {
     await api("/api/send", {
       method: "POST",
       headers: { "content-type": "application/json" },
-      body: JSON.stringify({ toAgents, subject: $("cSubject").value.trim() || "(no subject)", body }),
+      body: JSON.stringify({
+        toAgents,
+        subject: $("cSubject").value.trim() || "(no subject)",
+        body,
+        requiresAck: $("cAck").checked,
+        priority: $("cPriority").value,
+      }),
     });
     clearDraft({ clearFields: true });
     closeCompose({ preserveDraft: false });
@@ -728,6 +937,7 @@ async function loadMe() {
     myId = me.id;
     myDisplay = me.display || "jac";
     $("me").textContent = myDisplay;
+    renderUnreadTotal(inboxMessages);
   } catch { /* keep default */ }
 }
 
@@ -769,11 +979,12 @@ async function publishStatus(ev) {
 
 // wire up
 $("recipientInput").addEventListener("click", () => $("cTo").focus());
+// Actor ids never contain whitespace, so a space commits the token just like a comma.
 $("cTo").addEventListener("input", () => {
-  if ($("cTo").value.includes(",")) commitRecipientInput();
+  if (/[,\s]/.test($("cTo").value)) commitRecipientInput();
 });
 $("cTo").addEventListener("keydown", (ev) => {
-  if (ev.key === "Enter" || ev.key === ",") {
+  if (ev.key === "Enter" || ev.key === "," || ev.key === " ") {
     ev.preventDefault();
     commitRecipientInput();
   } else if (ev.key === "Backspace" && !$("cTo").value && recipientIds.length) {
@@ -792,6 +1003,13 @@ $("composeDiscard").addEventListener("click", discardDraft);
 $("composeForm").addEventListener("submit", sendCompose);
 $("replyForm").addEventListener("submit", sendReply);
 $("refreshBtn").addEventListener("click", loadInbox);
+$("closeMsgBtn").addEventListener("click", closeCurrentMessage);
+$("quoteBtn").addEventListener("click", quoteParent);
+$("cAck").addEventListener("change", queueDraftSave);
+$("cPriority").addEventListener("change", queueDraftSave);
+for (const b of document.querySelectorAll("#filters .filter")) {
+  b.addEventListener("click", () => setFilter(b.dataset.filter));
+}
 $("statusBoardBtn").addEventListener("click", openStatusBoard);
 $("viewAllBtn").addEventListener("click", toggleSenderAll);
 $("ackBtn").addEventListener("click", acknowledgeMessage);

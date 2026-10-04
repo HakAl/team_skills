@@ -3,7 +3,7 @@
 import { createServer } from "node:http";
 import { readFile } from "node:fs/promises";
 import { fileURLToPath } from "node:url";
-import { dirname, join, normalize, extname } from "node:path";
+import { dirname, join, normalize, extname, sep } from "node:path";
 import {
   listInbox,
   listSent,
@@ -12,6 +12,8 @@ import {
   sendMessage,
   listActors,
   ackMessage,
+  closeMessage,
+  PRIORITIES,
   postStatus,
   shutdown,
 } from "./mail.mjs";
@@ -19,6 +21,9 @@ import { PORT, HOST, ACTOR_DISPLAY, ACTOR_ID } from "./config.mjs";
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const PUBLIC = join(ROOT, "public");
+// list_inbox page size. The UI shows a note when the page is full, so older mail
+// is never silently invisible.
+const INBOX_LIMIT = 200;
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -38,6 +43,27 @@ async function readBody(req) {
   for await (const c of req) chunks.push(c);
   if (!chunks.length) return {};
   return JSON.parse(Buffer.concat(chunks).toString("utf-8"));
+}
+
+// Every POST sends as jac, so refuse anything a foreign web page could emit from the
+// operator's browser: a non-JSON content type (a simple cross-site form/text POST
+// needs no preflight) or an Origin that is not this loopback server.
+function rejectForeignPost(req, res) {
+  const ctype = String(req.headers["content-type"] || "");
+  if (!ctype.toLowerCase().startsWith("application/json")) {
+    sendJson(res, 415, { error: "expected application/json" });
+    return true;
+  }
+  const origin = req.headers.origin;
+  if (origin) {
+    let host = null;
+    try { host = new URL(origin).hostname; } catch { host = null; }
+    if (!host || !["127.0.0.1", "localhost", "::1", "[::1]"].includes(host)) {
+      sendJson(res, 403, { error: "cross-origin request refused" });
+      return true;
+    }
+  }
+  return false;
 }
 
 // Walk parent_message_id as far as the operator seat can read. Ancestors that jac
@@ -66,7 +92,7 @@ async function serveStatic(res, urlPath) {
   const rel = urlPath === "/" ? "/index.html" : urlPath;
   const safe = normalize(rel).replace(/^(\.\.[/\\])+/, "");
   const file = join(PUBLIC, safe);
-  if (!file.startsWith(PUBLIC)) {
+  if (file !== PUBLIC && !file.startsWith(PUBLIC + sep)) {
     res.writeHead(403);
     return res.end("forbidden");
   }
@@ -88,8 +114,8 @@ const server = createServer(async (req, res) => {
       return sendJson(res, 200, { display: ACTOR_DISPLAY, id: ACTOR_ID });
     }
     if (path === "/api/inbox" && req.method === "GET") {
-      const rows = await listInbox({ unreadOnly: false, limit: 50 });
-      return sendJson(res, 200, { messages: Array.isArray(rows) ? rows : [] });
+      const rows = await listInbox({ unreadOnly: false, limit: INBOX_LIMIT });
+      return sendJson(res, 200, { messages: Array.isArray(rows) ? rows : [], limit: INBOX_LIMIT });
     }
     if (path === "/api/sent" && req.method === "GET") {
       try {
@@ -133,6 +159,7 @@ const server = createServer(async (req, res) => {
         return sendJson(res, 200, { actors: [], rosterAvailable: false });
       }
     }
+    if (req.method === "POST" && rejectForeignPost(req, res)) return;
     if (path === "/api/send" && req.method === "POST") {
       const b = await readBody(req);
       const toAgents = Array.isArray(b.toAgents)
@@ -149,6 +176,7 @@ const server = createServer(async (req, res) => {
         body: b.body,
         parentMessageId: b.parentMessageId || null,
         requiresAck: !!b.requiresAck,
+        priority: PRIORITIES.includes(b.priority) ? b.priority : "normal",
       });
       return sendJson(res, 200, { ok: true, result });
     }
@@ -156,6 +184,13 @@ const server = createServer(async (req, res) => {
       const b = await readBody(req);
       if (!b.id) return sendJson(res, 400, { error: "missing id" });
       await ackMessage(b.id, b.response || "");
+      return sendJson(res, 200, { ok: true });
+    }
+    if (path === "/api/close" && req.method === "POST") {
+      const b = await readBody(req);
+      if (!b.id) return sendJson(res, 400, { error: "missing id" });
+      // Empty response: the substrate requires a threaded reply for close text.
+      await closeMessage(b.id, "");
       return sendJson(res, 200, { ok: true });
     }
     if (path === "/api/status" && req.method === "POST") {
