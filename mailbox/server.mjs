@@ -22,8 +22,9 @@ import { PORT, HOST, ACTOR_DISPLAY, ACTOR_ID } from "./config.mjs";
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const PUBLIC = join(ROOT, "public");
-// Written on listen, removed on stop; `npm run stop` targets exactly this process.
-const PIDFILE = join(ROOT, ".server.pid");
+// Per-port pidfile, written on listen and removed on stop (only if it still holds
+// our pid); `npm run stop` targets exactly this process on this port.
+const PIDFILE = join(ROOT, `.server.${PORT}.pid`);
 // list_inbox page size. The UI shows a note when the page is full, so older mail
 // is never silently invisible.
 const INBOX_LIMIT = 200;
@@ -238,7 +239,9 @@ function stop(signal) {
   stopping = true;
   console.log(`\nStopping mailbox (${signal})...`);
   server.close();
-  unlink(PIDFILE).catch(() => {});
+  readFile(PIDFILE, "utf-8")
+    .then((txt) => (txt.trim() === String(process.pid) ? unlink(PIDFILE) : undefined))
+    .catch(() => {});
   shutdown().finally(() => {
     console.log("Stopped.");
     process.exit(0);

@@ -67,12 +67,18 @@ export function callTool(name, args = {}) {
   return call(name, args);
 }
 
-// A rejection carrying a JSON-RPC error code (other than ConnectionClosed) is an
-// answer from a live child: unknown tool, bad arguments, request timeout. Anything
-// else (EPIPE on a dead stdin, ConnectionClosed from the SDK's close handler) is a
-// transport failure worth one reconnect.
-function isProtocolAnswer(err) {
-  return err instanceof McpError && err.code !== ErrorCode.ConnectionClosed;
+// Decide whether a rejected tool call means the child is gone (SDK 1.29 shapes):
+// - McpError with a JSON-RPC code: an answer from a live child (unknown tool, bad
+//   args) or a locally manufactured RequestTimeout; only ConnectionClosed, which the
+//   SDK raises when the child's close event rejects pending requests, means gone.
+// - A Zod validation error (has `issues`): a response ARRIVED and failed the result
+//   schema. The child is alive; tearing it down would be wrong and, for a write,
+//   would report "may not have landed" about a reply that was received.
+// - Anything else ("Not connected", EPIPE, write failure): the transport is gone.
+export function shouldReconnect(err) {
+  if (err instanceof McpError) return err.code === ErrorCode.ConnectionClosed;
+  if (err && Array.isArray(err.issues)) return false;
+  return true;
 }
 
 // Only calls that are harmless to repeat are replayed after a reconnect. A send,
@@ -124,7 +130,7 @@ async function call(name, args = {}) {
   try {
     result = await client.callTool({ name, arguments: args });
   } catch (err) {
-    if (isProtocolAnswer(err)) throw err;
+    if (!shouldReconnect(err)) throw err;
     // The in-flight rejection usually lands BEFORE the SDK's close event, so clear
     // the cache ourselves (only if it still points at the failed client), tear that
     // client down (bounded by the SDK's own escalation, so a misjudged healthy child

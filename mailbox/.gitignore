@@ -2,5 +2,5 @@ node_modules/
 tests/*-result.png
 tests/*-failure.png
 .server.log
-.server.pid
+.server.*.pid
 .mcp-child.log

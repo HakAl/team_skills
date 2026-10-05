@@ -25,10 +25,14 @@ Node backend + plain HTML/JS, no bundler. Webkit for e2e (chrome is not installe
   (in-flight death, whose rejection lands before the close event). A rejection that
   carries a JSON-RPC error code other than ConnectionClosed is an answer from a live
   child (unknown tool, bad args, timeout) and is surfaced unchanged, never a
-  reconnect. Only read calls (`list_*`, `read_message`) are replayed after the
-  reconnect; a `send_message`, `ack_message`, `close_message` or `post_status` that
-  was in flight may already have landed, so it reconnects and throws
-  `ConnectionLostError` telling the caller to reload and check before repeating.
+  reconnect. A Zod validation error (a response arrived but failed the result schema) also
+  passes through: the child is alive. Only read calls (`list_*`, `read_message`) are
+  replayed after the reconnect; `read_message` is idempotent on the substrate (it
+  moves `sent` to `read` once and keeps the first `read_at`). A `send_message`,
+  `ack_message`, `close_message` or `post_status` that was in flight may already
+  have landed, so it reconnects and throws `ConnectionLostError` telling the caller
+  to reload and check before repeating. Known limit: a hung (not dead) child yields
+  `RequestTimeout` on every call and is not torn down; restart the server.
   The child's stderr is appended at the OS level to `.mcp-child.log`
   (gitignored) along with spawn / closed / reconnect markers, so a death leaves
   evidence. `childPid()` is exported for the recovery test.
@@ -92,12 +96,14 @@ Node backend + plain HTML/JS, no bundler. Webkit for e2e (chrome is not installe
     not an agent). Awaiting an agent-comms fix; remove `hidden` and re-add
     `tests/status.mjs` to `verify` once the seat can publish status.
 - `scripts/check-connection.mjs` - step 0: prove the MCP client boots as jac.
-- `scripts/stop.mjs` - `npm run stop`. Reads `.server.pid` (written on listen,
-  removed on clean exit), SIGTERMs that one process, waits up to 5s for the SDK's
-  own child teardown, SIGKILLs after that, and removes the pidfile only once the
-  process is gone. No pattern matching across the machine. Without a pidfile it
-  says so and exits 0. A server started BEFORE this change has no pidfile; stop
-  that one by hand once (Ctrl+C in its terminal).
+- `scripts/stop.mjs` - `npm run stop` (honours `MAILBOX_PORT`). Reads
+  `.server.<port>.pid` (written on listen, removed on clean exit only if it still
+  holds that server's pid), checks via `ps` that the pid's command line is this
+  `server.mjs` (a pid reused after a crash is treated as stale and never signalled),
+  SIGTERMs it, waits up to 5s for the SDK's own child teardown, SIGKILLs after that,
+  and removes the pidfile only once the process is gone. No pattern matching across
+  the machine. Without a pidfile it says so and exits 0. A server started BEFORE
+  this change has no pidfile; stop that one by hand once (Ctrl+C in its terminal).
 - `tests/e2e.mjs` - webkit happy path (all sends self-targeted, so it never pings a
   real architect).
 - `tests/autocomplete.mjs` - webkit: roster loads, unknown recipient is blocked, valid
@@ -108,12 +114,14 @@ Node backend + plain HTML/JS, no bundler. Webkit for e2e (chrome is not installe
   click does not dismiss, send clears the draft, Discard clears it). Self-targeted.
 - `tests/ack.mjs` - webkit: mints a `requires_ack` self-message, verifies the inbox
   flag + Acknowledge control, acks it, verifies the flag clears. In `verify`.
-- `tests/mcp-recovery.mjs` - standalone (no web server, imports `mail.mjs`): SIGKILLs
-  the agent-comms child and calls in the same tick (in-flight path), then kills it
-  again and waits for the close event before calling (idle path), then kills it a
-  third time under a non-replayable `ack_message` and expects `ConnectionLostError`
-  plus a fresh child; asserts the spawn / closed / reconnect markers in
-  `.mcp-child.log`. In `verify`.
+- `tests/mcp-recovery.mjs` - standalone (no web server, imports `mail.mjs`): unit-checks
+  the reconnect classifier against the SDK's error shapes; SIGKILLs the agent-comms
+  child and calls in the same tick (in-flight path); kills it again and waits for the
+  close event before calling (idle path); kills it a third time under a self-addressed
+  `send_message` and expects `ConnectionLostError`, a fresh child, and zero copies of
+  that message in the inbox (a replay would land one); a live-child unknown-tool call
+  must not reconnect; asserts the spawn / closed / reconnect markers appended to
+  `.mcp-child.log` by this run. In `verify`.
 - `tests/triage.mjs` - webkit: mints a high-priority `requires_ack` self-message;
   checks unread total + title, priority badges, the three filters, reader To line and
   reply controls, Quote, the bulk "Close N read" tool, and closing from the reader.

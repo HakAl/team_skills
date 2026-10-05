@@ -50,19 +50,30 @@ over efficiency. Report only, change nothing.
 
 ## Reviewers, in order of preference
 
+Check availability first (`--version` or the skill's own preflight); on a failed
+invocation retry once, then fall through to the next. Every reviewer is a FRESH
+context given the lens, the artifact and nothing of the author's reasoning.
+
 1. `agy-review` skill on a concrete plan file or on the working-tree diff, with the
    lens as `--focus`. A different model, read-only by contract.
-2. Codex: write the lens prompt and material to `.worker/<task>/prompt.md`, run
-   `codex exec --full-auto -o .worker/<task>/response.md - < .worker/<task>/prompt.md`
-   with a timeout of 180s. The prompt says: inspect, report, modify nothing, stay
-   out of `_skills/`, `.claude/` and configuration.
-3. A fresh Claude subagent (Explore or general-purpose) given the lens and the
-   artifact, read-only.
+2. `codex exec` (a fresh context whether the author is Claude or Codex): prompt and
+   material in `.worker/<task>/prompt.md`, response to `.worker/<task>/response.md`,
+   run under the harness's command timeout (180s). The prompt says: inspect with
+   read-only tools, report, modify nothing. Reading `_skills/` or `.claude/` is fine
+   when they are the subject; writing them never is.
+3. A fresh subagent of the author's own runtime (Claude: Explore or
+   general-purpose), read-only, same prompt.
 
-Findings come back as `[!]` blockers and `[ ]` suggestions. Account for each one in
-the dialog: adopted, or rejected with a reason. Fix blockers, re-review the fix. Three
-rounds maximum, then stop and escalate to the user. If no reviewer is available,
-continue and report the missing review as a completion blocker; never claim it passed.
+## Review gate (what makes "reviewed" true)
+
+A review counts only when the dialog records all four: the reviewer (tool, and
+model if known); the exact reviewed revision (commit sha, or a sha256 of the diff
+or plan file); the invocation outcome (exit status, nonempty response); and the
+parsed verdict (`[!]` count, or an explicit no-blockers line). An empty or failed
+response is not "no findings". Changing hats is not a review. Account for every
+finding: adopted, or rejected with a reason. Fix blockers, re-review the fix, three
+rounds maximum, then stop and escalate. If no reviewer is reachable, the Outcome is
+BLOCKED on review, stated as such; never claim it passed.
 
 ## Dialog file
 
@@ -81,5 +92,6 @@ the handoff: goal, current evidence, next step. Nothing else is required.
 - Do not modify `.claude/`, hooks, installed skills, or this file as part of a task.
 - Ask only when a missing answer blocks progress or a consequential choice is the
   user's. Otherwise keep moving within the authorized scope.
-- Finish when the outcome is met, checks pass, and review findings are resolved or
-  explicitly accounted for. Report result, verification, and limits in a few lines.
+- Finish when the outcome is met, checks pass, and the review gate above is
+  satisfied for the plan (feature path) and the work. Report result, verification,
+  and limits in a few lines.

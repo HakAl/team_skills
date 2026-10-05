@@ -2,12 +2,17 @@
 // Case 1 (in-flight): SIGKILL the child and call list_actors in the same tick,
 // before the SDK's close event, so the rejection path in call() reconnects.
 // Case 2 (idle): kill, wait for exit so onclose clears the cache, then call.
-// Case 3 (non-replayable): kill under ack_message; expect ConnectionLostError and a
-// fresh child, no replay. Case 4 (live child): an unknown tool is a protocol answer,
+// Case 3 (non-replayable): kill under a self-addressed send_message; expect
+// ConnectionLostError, a fresh child, and the message NOT in the inbox (a replaying
+// implementation would land it exactly once, which this detects). Case 4 (live
+// child): an unknown tool is a protocol answer,
 // surfaced as-is with no reconnect. Case 5: the child log recorded all of it (only
 // the part appended by this run is inspected).
 import { readFile, stat } from "node:fs/promises";
-import { listActors, ackMessage, childPid, shutdown, callTool as listActorsRaw, CHILD_LOG } from "../mail.mjs";
+import { McpError, ErrorCode } from "@modelcontextprotocol/sdk/types.js";
+import { listActors, listInbox, sendMessage, childPid, shutdown, shouldReconnect, callTool as listActorsRaw, CHILD_LOG } from "../mail.mjs";
+
+const JAC = "01J00000000000000000000001";
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 function alive(pid) {
@@ -21,7 +26,15 @@ function ok(cond, msg) {
 
 const logStart = await stat(CHILD_LOG).then((s) => s.size).catch(() => 0);
 try {
-  console.log("0. cold start");
+  console.log("0a. reconnect classifier (SDK 1.29 error shapes)");
+  ok(shouldReconnect(new McpError(ErrorCode.ConnectionClosed, "closed")) === true, "ConnectionClosed -> reconnect");
+  ok(shouldReconnect(new McpError(ErrorCode.MethodNotFound, "nope")) === false, "coded JSON-RPC error -> pass through");
+  ok(shouldReconnect(new McpError(ErrorCode.RequestTimeout, "slow")) === false, "RequestTimeout -> pass through (no teardown)");
+  ok(shouldReconnect(Object.assign(new Error("invalid result"), { issues: [] })) === false, "response validation error -> pass through (child alive)");
+  ok(shouldReconnect(new Error("Not connected")) === true, "'Not connected' -> reconnect");
+  ok(shouldReconnect(Object.assign(new Error("write EPIPE"), { code: "EPIPE" })) === true, "EPIPE -> reconnect");
+
+  console.log("0b. cold start");
   ok(Array.isArray(await listActors()), "first call answers");
   const pid1 = childPid();
   ok(Number.isInteger(pid1) && pid1 > 0, `child pid is ${pid1}`);
@@ -44,13 +57,18 @@ try {
   ok(Number.isInteger(pid3) && pid3 !== pid2, `fresh child pid ${pid3} (was ${pid2})`);
 
   console.log("3. in-flight death on a NON-replayable call reconnects but does not replay");
+  const marker = `mailbox e2e-noreplay-${Date.now()}`;
   process.kill(pid3, "SIGKILL");
   let lost = null;
-  try { await ackMessage("msg_does_not_exist_recovery_test"); } catch (e) { lost = e; }
-  ok(lost && lost.name === "ConnectionLostError", `ack during death throws ConnectionLostError (${lost && lost.message})`);
+  try {
+    await sendMessage({ toAgents: [JAC], subject: marker, body: "must never land: sent into a dead child" });
+  } catch (e) { lost = e; }
+  ok(lost && lost.name === "ConnectionLostError", `send during death throws ConnectionLostError (${lost && lost.message})`);
   const pid4 = childPid();
   ok(Number.isInteger(pid4) && pid4 !== pid3, `reconnected anyway, fresh child pid ${pid4}`);
-  ok(Array.isArray(await listActors()), "next call on the fresh child answers");
+  const inbox = await listInbox({ unreadOnly: false, limit: 50 });
+  const landed = (Array.isArray(inbox) ? inbox : []).filter((m) => m.subject === marker).length;
+  ok(landed === 0, `the send was not replayed (found ${landed} copies in the inbox; a replay would show 1)`);
 
   console.log("4. live child: a protocol error is surfaced, no reconnect");
   let protoErr = null;
@@ -65,7 +83,7 @@ try {
   ok(log.includes(`child pid ${pid1} closed`) && log.includes(`spawned child pid ${pid2}`), "log records death 1 and respawn 2");
   ok(log.includes(`child pid ${pid2} closed`), "log records the idle death");
   ok(log.includes(`spawned child pid ${pid3}`), "log records the respawn");
-  ok(log.includes("reconnecting after failed ack_message"), "log records the non-replayable reconnect");
+  ok(log.includes("reconnecting after failed send_message"), "log records the non-replayable reconnect");
   console.log(failures ? `\nFAIL - ${failures} check(s) failed` : "\nPASS - MCP child recovery verified");
 } catch (e) {
   failures++;
