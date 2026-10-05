@@ -98,8 +98,11 @@ Node backend + plain HTML/JS, no bundler. Webkit for e2e (chrome is not installe
 - `scripts/check-connection.mjs` - step 0: prove the MCP client boots as jac.
 - `scripts/stop.mjs` - `npm run stop` (honours `MAILBOX_PORT`). Reads
   `.server.<port>.pid` (written on listen, removed on clean exit only if it still
-  holds that server's pid), checks via `ps` that the pid's command line is this
-  `server.mjs` (a pid reused after a crash is treated as stale and never signalled),
+  holds that server's pid, removed synchronously BEFORE the port is released so a
+  successor's pidfile can never be deleted), resolves the pid's script argument
+  against its working directory (`ps` + `lsof`) and requires it to be this exact
+  `server.mjs` (a pid reused after a crash, or another checkout's mailbox, is
+  treated as stale and never signalled),
   SIGTERMs it, waits up to 5s for the SDK's own child teardown, SIGKILLs after that,
   and removes the pidfile only once the process is gone. No pattern matching across
   the machine. Without a pidfile it says so and exits 0. A server started BEFORE

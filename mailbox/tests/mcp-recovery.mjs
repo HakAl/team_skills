@@ -66,9 +66,10 @@ try {
   ok(lost && lost.name === "ConnectionLostError", `send during death throws ConnectionLostError (${lost && lost.message})`);
   const pid4 = childPid();
   ok(Number.isInteger(pid4) && pid4 !== pid3, `reconnected anyway, fresh child pid ${pid4}`);
-  const inbox = await listInbox({ unreadOnly: false, limit: 50 });
+  const inbox = await listInbox({ unreadOnly: false, limit: 200 });
+  ok(Array.isArray(inbox), "inbox lookup returned a list (so an absent marker means absent, not unreadable)");
   const landed = (Array.isArray(inbox) ? inbox : []).filter((m) => m.subject === marker).length;
-  ok(landed === 0, `the send was not replayed (found ${landed} copies in the inbox; a replay would show 1)`);
+  ok(landed === 0, `the send was not replayed (found ${landed} copies among ${Array.isArray(inbox) ? inbox.length : 0} rows; a replay would show 1)`);
 
   console.log("4. live child: a protocol error is surfaced, no reconnect");
   let protoErr = null;

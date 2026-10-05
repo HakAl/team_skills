@@ -1,8 +1,8 @@
 // Buildless Node backend for the jac mailbox. Serves the static UI and a small
 // JSON API over the mail module (one warm MCP client, identity = jac).
 import { createServer } from "node:http";
-import { readFile, unlink } from "node:fs/promises";
-import { writeFileSync, renameSync } from "node:fs";
+import { readFile } from "node:fs/promises";
+import { writeFileSync, renameSync, readFileSync, unlinkSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join, normalize, extname, sep } from "node:path";
 import {
@@ -238,10 +238,14 @@ function stop(signal) {
   if (stopping) return;
   stopping = true;
   console.log(`\nStopping mailbox (${signal})...`);
+  // Remove our pidfile synchronously and BEFORE releasing the port: while we still
+  // hold the port no replacement instance can have published its own pidfile, so
+  // the read-then-unlink cannot delete a successor's file, and it cannot be
+  // outrun by process.exit.
+  try {
+    if (readFileSync(PIDFILE, "utf-8").trim() === String(process.pid)) unlinkSync(PIDFILE);
+  } catch { /* absent or not ours */ }
   server.close();
-  readFile(PIDFILE, "utf-8")
-    .then((txt) => (txt.trim() === String(process.pid) ? unlink(PIDFILE) : undefined))
-    .catch(() => {});
   shutdown().finally(() => {
     console.log("Stopped.");
     process.exit(0);
