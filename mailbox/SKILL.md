@@ -97,16 +97,17 @@ Node backend + plain HTML/JS, no bundler. Webkit for e2e (chrome is not installe
     `tests/status.mjs` to `verify` once the seat can publish status.
 - `scripts/check-connection.mjs` - step 0: prove the MCP client boots as jac.
 - `scripts/stop.mjs` - `npm run stop` (honours `MAILBOX_PORT`). Reads
-  `.server.<port>.pid` (written on listen, removed on clean exit only if it still
-  holds that server's pid, removed synchronously BEFORE the port is released so a
-  successor's pidfile can never be deleted), resolves the pid's script argument
-  against its working directory (`ps` + `lsof`) and requires it to be this exact
-  `server.mjs` (a pid reused after a crash, or another checkout's mailbox, is
-  treated as stale and never signalled),
-  SIGTERMs it, waits up to 5s for the SDK's own child teardown, SIGKILLs after that,
-  and removes the pidfile only once the process is gone. No pattern matching across
-  the machine. Without a pidfile it says so and exits 0. A server started BEFORE
-  this change has no pidfile; stop that one by hand once (Ctrl+C in its terminal).
+  `.server.<port>.pid` (written on listen via tmp + rename; removed by the server
+  synchronously BEFORE it releases the port, so a successor's pidfile can never be
+  deleted by its predecessor). Identity is not argv parsing: the pid must be the one
+  LISTENING on host:port (`lsof`) and its command line must mention `server.mjs`; a
+  pid reused after a crash is treated as stale and never signalled; if `lsof` is
+  unavailable it fails closed (nothing signalled, pidfile kept, exit 1). SIGTERM,
+  up to 5s for the SDK's own child teardown, then SIGKILL, up to 8s. Pidfile
+  removal is a single synchronous read-compare-unlink against the exact bytes read;
+  a successor publishing inside that microsecond window is the residual race. A
+  server started BEFORE this change has no pidfile; stop that one by hand once
+  (Ctrl+C in its terminal).
 - `tests/e2e.mjs` - webkit happy path (all sends self-targeted, so it never pings a
   real architect).
 - `tests/autocomplete.mjs` - webkit: roster loads, unknown recipient is blocked, valid
