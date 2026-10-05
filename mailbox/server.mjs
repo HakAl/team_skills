@@ -1,7 +1,8 @@
 // Buildless Node backend for the jac mailbox. Serves the static UI and a small
 // JSON API over the mail module (one warm MCP client, identity = jac).
 import { createServer } from "node:http";
-import { readFile } from "node:fs/promises";
+import { readFile, unlink } from "node:fs/promises";
+import { writeFileSync, renameSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join, normalize, extname, sep } from "node:path";
 import {
@@ -21,6 +22,8 @@ import { PORT, HOST, ACTOR_DISPLAY, ACTOR_ID } from "./config.mjs";
 
 const ROOT = dirname(fileURLToPath(import.meta.url));
 const PUBLIC = join(ROOT, "public");
+// Written on listen, removed on stop; `npm run stop` targets exactly this process.
+const PIDFILE = join(ROOT, ".server.pid");
 // list_inbox page size. The UI shows a note when the page is full, so older mail
 // is never silently invisible.
 const INBOX_LIMIT = 200;
@@ -218,6 +221,11 @@ server.on("error", (err) => {
 });
 
 server.listen(PORT, HOST, () => {
+  // Write-then-rename so stop.mjs can never read a half-written pidfile.
+  try {
+    writeFileSync(PIDFILE + ".tmp", String(process.pid));
+    renameSync(PIDFILE + ".tmp", PIDFILE);
+  } catch { /* best effort */ }
   console.log(`mailbox (as ${ACTOR_DISPLAY}) at http://${HOST}:${PORT}`);
   console.log("Press Ctrl+C to stop.");
 });
@@ -230,6 +238,7 @@ function stop(signal) {
   stopping = true;
   console.log(`\nStopping mailbox (${signal})...`);
   server.close();
+  unlink(PIDFILE).catch(() => {});
   shutdown().finally(() => {
     console.log("Stopped.");
     process.exit(0);

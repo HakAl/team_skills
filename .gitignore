@@ -27,3 +27,4 @@ nul
 demo-config.yml
 demo.yml
 *.cast
+.worker/

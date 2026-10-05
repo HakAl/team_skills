@@ -6,7 +6,7 @@
   "description": "Local web mailbox over agent-comms, acting as jac.",
   "scripts": {
     "start": "node server.mjs",
-    "stop": "pkill -f 'node server.mjs' || true",
+    "stop": "node scripts/stop.mjs",
     "check": "node scripts/check-connection.mjs",
     "e2e": "node tests/e2e.mjs",
     "e2e:autocomplete": "node tests/autocomplete.mjs",
@@ -16,8 +16,9 @@
     "e2e:compose-draft": "node tests/compose-draft.mjs",
     "e2e:ack": "node tests/ack.mjs",
     "e2e:status": "node tests/status.mjs",
-    "verify": "node tests/e2e.mjs && node tests/autocomplete.mjs && node tests/view-all.mjs && node tests/compose-draft.mjs && node tests/ack.mjs && node tests/sent-merge.mjs && node tests/status-board.mjs && node tests/triage.mjs && node scripts/cleanup-tests.mjs",
-    "e2e:triage": "node tests/triage.mjs"
+    "verify": "node tests/e2e.mjs && node tests/autocomplete.mjs && node tests/view-all.mjs && node tests/compose-draft.mjs && node tests/ack.mjs && node tests/sent-merge.mjs && node tests/status-board.mjs && node tests/triage.mjs && node tests/mcp-recovery.mjs && node scripts/cleanup-tests.mjs",
+    "e2e:triage": "node tests/triage.mjs",
+    "e2e:mcp-recovery": "node tests/mcp-recovery.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0"

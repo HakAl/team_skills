@@ -2,32 +2,90 @@
 // One warm MCP client, one identity (see config.mjs). No pool, no switcher.
 import { Client } from "@modelcontextprotocol/sdk/client/index.js";
 import { StdioClientTransport } from "@modelcontextprotocol/sdk/client/stdio.js";
+import { McpError, ErrorCode } from "@modelcontextprotocol/sdk/types.js";
+import { openSync, writeSync } from "node:fs";
+import { fileURLToPath } from "node:url";
 import { MCP_COMMAND, MCP_ARGS, MCP_ENV } from "./config.mjs";
 
-let clientPromise = null;
+// The child's stderr goes to this file at the OS level (an append fd handed to
+// spawn, no stream piping in Node), so a death leaves its last words on disk.
+export const CHILD_LOG = fileURLToPath(new URL("./.mcp-child.log", import.meta.url));
+let logFd = null;
 
-async function getClient() {
+function openLog() {
+  if (logFd === null) {
+    try { logFd = openSync(CHILD_LOG, "a"); } catch { logFd = null; }
+  }
+  return logFd;
+}
+
+function logLine(text) {
+  if (openLog() === null) return;
+  try { writeSync(logFd, `[${new Date().toISOString()}] mailbox: ${text}\n`); } catch { /* never break mail */ }
+}
+
+let clientPromise = null;
+let current = null; // { client, pid } for the live connection
+
+function getClient() {
   if (clientPromise) return clientPromise;
-  clientPromise = (async () => {
+  const promise = (async () => {
+    const fd = openLog();
     const transport = new StdioClientTransport({
       command: MCP_COMMAND,
       args: MCP_ARGS,
       env: MCP_ENV,
-      // Silence the child server's startup logs and its Ctrl+C traceback so they
-      // never pollute the terminal. The server still works; we just drop its stderr.
-      stderr: "ignore",
+      stderr: fd === null ? "ignore" : fd,
     });
-    const client = new Client(
-      { name: "mailbox", version: "0.1.0" },
-      { capabilities: {} }
-    );
+    const client = new Client({ name: "mailbox", version: "0.1.0" }, { capabilities: {} });
     await client.connect(transport);
+    const pid = transport.pid; // null again by the time onclose runs; capture now
+    current = { client, pid };
+    logLine(`spawned child pid ${pid}`);
+    // Only onclose means the child is gone. onerror also fires for protocol-level
+    // noise on a healthy child, so it must never reset the cache.
+    client.onclose = () => {
+      logLine(`child pid ${pid} closed`);
+      if (clientPromise === promise) clientPromise = null;
+      if (current && current.client === client) current = null;
+    };
+    client.onerror = (err) => logLine(`client error (pid ${pid}): ${err && err.message ? err.message : err}`);
     return client;
-  })().catch((err) => {
-    clientPromise = null; // allow retry on next call
-    throw err;
-  });
-  return clientPromise;
+  })();
+  clientPromise = promise;
+  promise.catch(() => { if (clientPromise === promise) clientPromise = null; });
+  return promise;
+}
+
+// Pid of the live child, or null. Exposed for the recovery test.
+export function childPid() {
+  return current ? current.pid : null;
+}
+
+// Raw tool call by name. Exposed for the recovery test (unknown-tool case).
+export function callTool(name, args = {}) {
+  return call(name, args);
+}
+
+// A rejection carrying a JSON-RPC error code (other than ConnectionClosed) is an
+// answer from a live child: unknown tool, bad arguments, request timeout. Anything
+// else (EPIPE on a dead stdin, ConnectionClosed from the SDK's close handler) is a
+// transport failure worth one reconnect.
+function isProtocolAnswer(err) {
+  return err instanceof McpError && err.code !== ErrorCode.ConnectionClosed;
+}
+
+// Only calls that are harmless to repeat are replayed after a reconnect. A send,
+// ack, close or status that was in flight when the child died MAY have landed; the
+// caller must look before repeating it, so those surface a clear error instead.
+const REPLAYABLE = new Set(["list_inbox", "list_actors", "list_sent", "list_status", "read_message"]);
+
+export class ConnectionLostError extends Error {
+  constructor(name) {
+    super(`connection to agent-comms was lost while ${name} was in flight; it may or may not have landed. Reload and check before repeating it.`);
+    this.name = "ConnectionLostError";
+    this.tool = name;
+  }
 }
 
 // FastMCP returns tool output either as structuredContent or as JSON text.
@@ -60,8 +118,25 @@ function parseToolResult(result) {
 }
 
 async function call(name, args = {}) {
-  const client = await getClient();
-  const result = await client.callTool({ name, arguments: args });
+  const first = getClient();
+  const client = await first;
+  let result;
+  try {
+    result = await client.callTool({ name, arguments: args });
+  } catch (err) {
+    if (isProtocolAnswer(err)) throw err;
+    // The in-flight rejection usually lands BEFORE the SDK's close event, so clear
+    // the cache ourselves (only if it still points at the failed client), tear that
+    // client down (bounded by the SDK's own escalation, so a misjudged healthy child
+    // is stopped rather than leaked), then rebuild and retry exactly once.
+    if (clientPromise === first) clientPromise = null;
+    if (current && current.client === client) current = null;
+    try { await client.close(); } catch { /* already gone */ }
+    logLine(`reconnecting after failed ${name}: ${err && err.message ? err.message : err}`);
+    const fresh = await getClient();
+    if (!REPLAYABLE.has(name)) throw new ConnectionLostError(name);
+    result = await fresh.callTool({ name, arguments: args });
+  }
   return parseToolResult(result);
 }
 
@@ -120,6 +195,7 @@ export async function shutdown() {
   if (!clientPromise) return;
   const pending = clientPromise;
   clientPromise = null;
+  current = null;
   try {
     const client = await pending;
     await client.close();

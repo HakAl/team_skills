@@ -3,6 +3,18 @@
 Date: 2026-06-28. Author: engineering-architect session. Supersedes the pre-build
 HANDOFF-mailbox.md for everything below.
 
+## ADDENDUM (2026-10-04, later): worker dry run shipped MCP recovery + pidfile stop
+
+New skill `worker/SKILL.md` (tiger routing + duet external review + persona lenses;
+install by symlink into ~/.claude/skills/worker). Its first dry run took
+`.team/research/TASK-mailbox-mcp-recovery.md` to a reviewed change: mail.mjs
+reconnects once after a dead agent-comms child (reads replayed, mutations surface
+ConnectionLostError), child stderr in mailbox/.mcp-child.log, `npm run stop` via
+.server.pid, tests/mcp-recovery.mjs (5 cases) in verify. Dialog + saved reviewer
+report in .worker/mailbox-mcp-recovery/ (gitignored, local evidence). Two agy-review
+rounds found 5 real blockers before merge. Parked from the earlier list: nothing
+else owed on mailbox except the substrate sent-items tool.
+
 ## RESUME HERE (2026-10-04 Fable session: inbox triage batch shipped)
 
 jac asked for "slightly better" inbox. Review agent (nifty-neo) produced a ranked list;
