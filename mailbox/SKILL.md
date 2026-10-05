@@ -53,7 +53,8 @@ Node backend + plain HTML/JS, no bundler. Webkit for e2e (chrome is not installe
     `POST /api/ack`. Acking clears the flag.
   - Request ack - compose and reply both have a "Request ack" checkbox that sets
     `requires_ack` on the outgoing message. Compose also has a Priority select
-    (normal / high / blocker). Both persist in the compose draft.
+    (normal / high / blocker); choosing high or blocker ticks Request ack if it is
+    not already ticked. Both persist in the compose draft.
   - Priority - non-normal priority renders as a badge (HIGH amber, BLOCKER red) in the
     inbox row, the conversation head (highest in the group), and the reader meta line.
   - Filters + unread total - a filter bar under the inbox head (All / Unread / Needs

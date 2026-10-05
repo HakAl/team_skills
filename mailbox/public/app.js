@@ -1006,7 +1006,11 @@ $("refreshBtn").addEventListener("click", loadInbox);
 $("closeMsgBtn").addEventListener("click", closeCurrentMessage);
 $("quoteBtn").addEventListener("click", quoteParent);
 $("cAck").addEventListener("change", queueDraftSave);
-$("cPriority").addEventListener("change", queueDraftSave);
+$("cPriority").addEventListener("change", () => {
+  // Raising the priority implies wanting an ack: tick the box if it is not already.
+  if ($("cPriority").value !== "normal" && !$("cAck").checked) $("cAck").checked = true;
+  queueDraftSave();
+});
 for (const b of document.querySelectorAll("#filters .filter")) {
   b.addEventListener("click", () => setFilter(b.dataset.filter));
 }

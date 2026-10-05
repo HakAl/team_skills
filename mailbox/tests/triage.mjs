@@ -96,8 +96,8 @@ try {
   await page.type("#cTo", JAC + " ");
   await page.fill("#cSubject", composed);
   await page.fill("#cBody", "compose with ack requested");
-  await page.check("#cAck");
   await page.selectOption("#cPriority", "blocker");
+  assert(await page.isChecked("#cAck"), "selecting a priority auto-checks Request ack");
   await page.click("#composeSend");
   await page.waitForFunction((s) => {
     const row = [...document.querySelectorAll(".group-msgs .msg")].find((el) => el.textContent.includes(s));
